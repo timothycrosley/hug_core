@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """setup.py
 
-Defines the setup instructions for the hug framework
+Defines the setup instructions for the core of the hug framework
 
 Copyright (C) 2016  Timothy Edmund Crosley
 
@@ -66,8 +66,8 @@ if CYTHON:
         return module_names
 
     ext_modules = [
-        Extension("hug." + ext, [path.join("hug", ext + ".py")])
-        for ext in list_modules(path.join(MYDIR, "hug"))
+        Extension("hug_core." + ext, [path.join("hug_core", ext + ".py")])
+        for ext in list_modules(path.join(MYDIR, "hug_core"))
     ]
     cmdclass["build_ext"] = build_ext
 
@@ -77,7 +77,7 @@ with open("README.md", encoding="utf-8") as f:  # Loads in the README for PyPI
 
 
 setup(
-    name="hug",
+    name="hug_core",
     version="2.5.6",
     description="A Python framework that makes developing APIs "
     "as simple as possible, but no simpler.",
@@ -87,14 +87,14 @@ setup(
     author="Timothy Crosley",
     author_email="timothy.crosley@gmail.com",
     # These appear in the left hand side bar on PyPI
-    url="https://github.com/timothycrosley/hug",
+    url="https://github.com/timothycrosley/hug_core",
     project_urls={
         "Documentation": "http://www.hug.rest/",
-        "Gitter": "https://gitter.im/timothycrosley/hug",
+        "Gitter": "https://gitter.im/timothycrosley/hug_core",
     },
     license="MIT",
-    entry_points={"console_scripts": ["hug = hug:development_runner.hug.interface.cli"]},
-    packages=["hug"],
+    entry_points={"console_scripts": []},
+    packages=["hug_core"],
     requires=["falcon", "requests"],
     install_requires=["falcon==2.0.0", "requests"],
     setup_requires=["pytest-runner"],

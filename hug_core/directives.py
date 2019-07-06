@@ -90,25 +90,6 @@ def documentation(default=None, api_version=None, api=None, **kwargs):
 
 
 @_built_in_directive
-def session(context_name="session", request=None, **kwargs):
-    """Returns the session associated with the current request"""
-    return request and request.context.get(context_name, None)
-
-
-@_built_in_directive
-def user(default=None, request=None, **kwargs):
-    """Returns the current logged in user"""
-    return request and request.context.get("user", None) or default
-
-
-@_built_in_directive
-def cors(support="*", response=None, **kwargs):
-    """Adds the the Access-Control-Allow-Origin header to this endpoint, with the specified support"""
-    response and response.set_header("Access-Control-Allow-Origin", support)
-    return support
-
-
-@_built_in_directive
 class CurrentAPI(object):
     """Returns quick access to all api functions on the current version of the api"""
 

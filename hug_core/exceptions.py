@@ -36,5 +36,3 @@ class StoreKeyNotFound(Exception):
 
 class SessionNotFound(StoreKeyNotFound):
     """Should be raised when a session ID has not been found inside a session store"""
-
-    pass

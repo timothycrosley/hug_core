@@ -1,6 +1,6 @@
 """tests/test_main.py.
 
-Basic testing of hug's `__main__` module
+Basic testing of hug_core's `__main__` module
 
 Copyright (C) 2016 Timothy Edmund Crosley
 
@@ -25,4 +25,4 @@ import pytest
 def test_main(capsys):
     """Main module should be importable, but should raise a SystemExit after CLI docs print"""
     with pytest.raises(SystemExit):
-        from hug import __main__
+        from hug_core import __main__

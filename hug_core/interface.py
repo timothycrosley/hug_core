@@ -1,6 +1,6 @@
-"""hug/interface.py
+"""hug_core/interface.py
 
-Defines the various interface hug provides to expose routes to functions
+Defines the various interface hug_core provides to expose routes to functions
 
 Copyright (C) 2016  Timothy Edmund Crosley
 
@@ -31,14 +31,14 @@ from functools import lru_cache, partial, wraps
 import falcon
 from falcon import HTTP_BAD_REQUEST
 
-import hug._empty as empty
-import hug.api
-import hug.output_format
-import hug.types as types
-from hug import introspect
-from hug.exceptions import InvalidTypeData
-from hug.format import parse_content_type
-from hug.types import (
+import hug_core._empty as empty
+import hug_core.api
+import hug_core.output_format
+import hug_core.types as types
+from hug_core import introspect
+from hug_core.exceptions import InvalidTypeData
+from hug_core.format import parse_content_type
+from hug_core.types import (
     MarshmallowInputSchema,
     MarshmallowReturnSchema,
     Multiple,
@@ -60,10 +60,10 @@ def asyncio_call(function, *args, **kwargs):
 
 
 class Interfaces(object):
-    """Defines the per-function singleton applied to hugged functions defining common data needed by all interfaces"""
+    """Defines the per-function singleton applied to hug_coreged functions defining common data needed by all interfaces"""
 
     def __init__(self, function, args=None):
-        self.api = hug.api.from_object(function)
+        self.api = hug_core.api.from_object(function)
         self.spec = getattr(function, "original", function)
         self.arguments = introspect.arguments(function)
         self.name = introspect.name(function)
@@ -117,19 +117,19 @@ class Interfaces(object):
 
             self.input_transformations[name] = transformer
 
-    def __call__(__hug_internal_self, *args, **kwargs):  # noqa: N805
-        """"Calls the wrapped function, uses __hug_internal_self incase self is passed in as a kwarg from the wrapper"""
-        if not __hug_internal_self.is_coroutine:
-            return __hug_internal_self._function(*args, **kwargs)
+    def __call__(__hug_core_internal_self, *args, **kwargs):  # noqa: N805
+        """"Calls the wrapped function, uses __hug_core_internal_self incase self is passed in as a kwarg from the wrapper"""
+        if not __hug_core_internal_self.is_coroutine:
+            return __hug_core_internal_self._function(*args, **kwargs)
 
-        return asyncio_call(__hug_internal_self._function, *args, **kwargs)
+        return asyncio_call(__hug_core_internal_self._function, *args, **kwargs)
 
 
 class Interface(object):
-    """Defines the basic hug interface object, which is responsible for wrapping a user defined function and providing
+    """Defines the basic hug_core interface object, which is responsible for wrapping a user defined function and providing
        all the info requested in the function as well as the route
 
-       A Interface object should be created for every kind of protocal hug supports
+       A Interface object should be created for every kind of protocal hug_core supports
     """
 
     __slots__ = (
@@ -317,7 +317,7 @@ class Interface(object):
             for param in self.parameters
             if not param in ("request", "response", "self")
             and not param in ("api_version", "body")
-            and not param.startswith("hug_")
+            and not param.startswith("hug_core_")
             and not hasattr(param, "directive")
         ]
         if parameters:

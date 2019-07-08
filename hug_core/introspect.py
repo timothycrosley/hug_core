@@ -1,6 +1,6 @@
-"""hug/introspect.py
+"""hug_core/introspect.py
 
-Defines built in hug functions to aid in introspection
+Defines built in hug_core functions to aid in introspection
 
 Copyright (C) 2016  Timothy Edmund Crosley
 

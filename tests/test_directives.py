@@ -23,22 +23,22 @@ from base64 import b64encode
 
 import pytest
 
-import hug
+import hug_core
 
-api = hug.API(__name__)
+api = hug_core.API(__name__)
 
 # Fix flake8 undefined names (F821)
-__hug__ = __hug__  # noqa
+__hug_core__ = __hug_core__  # noqa
 
 
 def test_timer():
     """Tests that the timer directive outputs the correct format, and automatically attaches itself to an API"""
-    timer = hug.directives.Timer()
+    timer = hug_core.directives.Timer()
     assert isinstance(timer.start, float)
     assert isinstance(float(timer), float)
     assert isinstance(int(timer), int)
 
-    timer = hug.directives.Timer(3)
+    timer = hug_core.directives.Timer(3)
     assert isinstance(timer.start, float)
     assert isinstance(float(timer), float)
     assert isinstance(int(timer), int)
@@ -46,79 +46,79 @@ def test_timer():
     assert isinstance(repr(timer), str)
     assert float(timer) < timer.start
 
-    @hug.get()
-    @hug.local()
-    def timer_tester(hug_timer):
-        return hug_timer
+    @hug_core.get()
+    @hug_core.local()
+    def timer_tester(hug_core_timer):
+        return hug_core_timer
 
-    assert isinstance(hug.test.get(api, "timer_tester").data, float)
-    assert isinstance(timer_tester(), hug.directives.Timer)
+    assert isinstance(hug_core.test.get(api, "timer_tester").data, float)
+    assert isinstance(timer_tester(), hug_core.directives.Timer)
 
 
 def test_module():
     """Test to ensure the module directive automatically includes the current API's module"""
 
-    @hug.get()
-    def module_tester(hug_module):
-        return hug_module.__name__
+    @hug_core.get()
+    def module_tester(hug_core_module):
+        return hug_core_module.__name__
 
-    assert hug.test.get(api, "module_tester").data == api.module.__name__
+    assert hug_core.test.get(api, "module_tester").data == api.module.__name__
 
 
 def test_api():
-    """Ensure the api correctly gets passed onto a hug API function based on a directive"""
+    """Ensure the api correctly gets passed onto a hug_core API function based on a directive"""
 
-    @hug.get()
-    def api_tester(hug_api):
-        return hug_api == api
+    @hug_core.get()
+    def api_tester(hug_core_api):
+        return hug_core_api == api
 
-    assert hug.test.get(api, "api_tester").data is True
+    assert hug_core.test.get(api, "api_tester").data is True
 
 
 def test_documentation():
     """Test documentation directive"""
-    assert "handlers" in hug.directives.documentation(api=api)
+    assert "handlers" in hug_core.directives.documentation(api=api)
 
 
 def test_api_version():
     """Ensure that it's possible to get the current version of an API based on a directive"""
 
-    @hug.get(versions=1)
-    def version_tester(hug_api_version):
-        return hug_api_version
+    @hug_core.get(versions=1)
+    def version_tester(hug_core_api_version):
+        return hug_core_api_version
 
-    assert hug.test.get(api, "v1/version_tester").data == 1
+    assert hug_core.test.get(api, "v1/version_tester").data == 1
 
 
 def test_current_api():
     """Ensure that it's possible to retrieve methods from the same version of the API"""
 
-    @hug.get(versions=1)
+    @hug_core.get(versions=1)
     def first_method():
         return "Success"
 
-    @hug.get(versions=1)
-    def version_call_tester(hug_current_api):
-        return hug_current_api.first_method()
+    @hug_core.get(versions=1)
+    def version_call_tester(hug_core_current_api):
+        return hug_core_current_api.first_method()
 
-    assert hug.test.get(api, "v1/version_call_tester").data == "Success"
+    assert hug_core.test.get(api, "v1/version_call_tester").data == "Success"
 
-    @hug.get()
+    @hug_core.get()
     def second_method():
         return "Unversioned"
 
-    @hug.get(versions=2)  # noqa
-    def version_call_tester(hug_current_api):
-        return hug_current_api.second_method()
+    @hug_core.get(versions=2)  # noqa
+    def version_call_tester(hug_core_current_api):
+        return hug_core_current_api.second_method()
 
-    assert hug.test.get(api, "v2/version_call_tester").data == "Unversioned"
+    assert hug_core.test.get(api, "v2/version_call_tester").data == "Unversioned"
 
-    @hug.get(versions=3)  # noqa
-    def version_call_tester(hug_current_api):
-        return hug_current_api.first_method()
+    @hug_core.get(versions=3)  # noqa
+    def version_call_tester(hug_core_current_api):
+        return hug_core_current_api.first_method()
 
     with pytest.raises(AttributeError):
-        hug.test.get(api, "v3/version_call_tester").data
+        hug_core.test.get(api, "v3/version_call_tester").data
 
 
 def test_user():
@@ -126,13 +126,13 @@ def test_user():
     user = "test_user"
     password = "super_secret"
 
-    @hug.get(requires=hug.authentication.basic(hug.authentication.verify(user, password)))
-    def authenticated_hello(hug_user):
-        return hug_user
+    @hug_core.get(requires=hug_core.authentication.basic(hug_core.authentication.verify(user, password)))
+    def authenticated_hello(hug_core_user):
+        return hug_core_user
 
     token = b64encode("{0}:{1}".format(user, password).encode("utf8")).decode("utf8")
     assert (
-        hug.test.get(
+        hug_core.test.get(
             api, "authenticated_hello", headers={"Authorization": "Basic {0}".format(token)}
         ).data
         == user
@@ -142,43 +142,43 @@ def test_user():
 def test_session_directive():
     """Ensure that it's possible to retrieve the session withing a request using the built-in session directive"""
 
-    @hug.request_middleware()
+    @hug_core.request_middleware()
     def add_session(request, response):
         request.context["session"] = {"test": "data"}
 
-    @hug.local()
-    @hug.get()
-    def session_data(hug_session):
-        return hug_session
+    @hug_core.local()
+    @hug_core.get()
+    def session_data(hug_core_session):
+        return hug_core_session
 
     assert session_data() is None
-    assert hug.test.get(api, "session_data").data == {"test": "data"}
+    assert hug_core.test.get(api, "session_data").data == {"test": "data"}
 
 
 def test_named_directives():
     """Ensure that it's possible to attach directives to named parameters"""
 
-    @hug.get()
-    def test(time: hug.directives.Timer = 3):
+    @hug_core.get()
+    def test(time: hug_core.directives.Timer = 3):
         return time
 
     assert isinstance(test(1), int)
 
-    test = hug.local()(test)
-    assert isinstance(test(), hug.directives.Timer)
+    test = hug_core.local()(test)
+    assert isinstance(test(), hug_core.directives.Timer)
 
 
 def test_local_named_directives():
     """Ensure that it's possible to attach directives to local function calling"""
 
-    @hug.local()
-    def test(time: __hug__.directive("timer") = 3):
+    @hug_core.local()
+    def test(time: __hug_core__.directive("timer") = 3):
         return time
 
-    assert isinstance(test(), hug.directives.Timer)
+    assert isinstance(test(), hug_core.directives.Timer)
 
-    @hug.local(directives=False)
-    def test(time: __hug__.directive("timer") = 3):
+    @hug_core.local(directives=False)
+    def test(time: __hug_core__.directive("timer") = 3):
         return time
 
     assert isinstance(test(3), int)
@@ -187,55 +187,55 @@ def test_local_named_directives():
 def test_named_directives_by_name():
     """Ensure that it's possible to attach directives to named parameters using only the name of the directive"""
 
-    @hug.get()
-    @hug.local()
-    def test(time: __hug__.directive("timer") = 3):
+    @hug_core.get()
+    @hug_core.local()
+    def test(time: __hug_core__.directive("timer") = 3):
         return time
 
-    assert isinstance(test(), hug.directives.Timer)
+    assert isinstance(test(), hug_core.directives.Timer)
 
 
 def test_per_api_directives():
     """Test to ensure it's easy to define a directive within an API"""
 
-    @hug.directive(apply_globally=False)
+    @hug_core.directive(apply_globally=False)
     def test(default=None, **kwargs):
         return default
 
-    @hug.get()
-    def my_api_method(hug_test="heyyy"):
-        return hug_test
+    @hug_core.get()
+    def my_api_method(hug_core_test="heyyy"):
+        return hug_core_test
 
-    assert hug.test.get(api, "my_api_method").data == "heyyy"
+    assert hug_core.test.get(api, "my_api_method").data == "heyyy"
 
 
 def test_user_directives():
     """Test the user directives functionality, to ensure it will provide the set user object"""
 
-    @hug.get()  # noqa
-    def try_user(user: hug.directives.user):
+    @hug_core.get()  # noqa
+    def try_user(user: hug_core.directives.user):
         return user
 
-    assert hug.test.get(api, "try_user").data is None
+    assert hug_core.test.get(api, "try_user").data is None
 
-    @hug.get(
-        requires=hug.authentication.basic(hug.authentication.verify("Tim", "Custom password"))
+    @hug_core.get(
+        requires=hug_core.authentication.basic(hug_core.authentication.verify("Tim", "Custom password"))
     )  # noqa
-    def try_user(user: hug.directives.user):
+    def try_user(user: hug_core.directives.user):
         return user
 
     token = b"Basic " + b64encode("{0}:{1}".format("Tim", "Custom password").encode("utf8"))
-    assert hug.test.get(api, "try_user", headers={"Authorization": token}).data == "Tim"
+    assert hug_core.test.get(api, "try_user", headers={"Authorization": token}).data == "Tim"
 
 
-def test_directives(hug_api):
+def test_directives(hug_core_api):
     """Test to ensure cors directive works as expected"""
-    assert hug.directives.cors("google.com") == "google.com"
+    assert hug_core.directives.cors("google.com") == "google.com"
 
-    @hug.get(api=hug_api)
-    def cors_supported(cors: hug.directives.cors = "*"):
+    @hug_core.get(api=hug_core_api)
+    def cors_supported(cors: hug_core.directives.cors = "*"):
         return True
 
     assert (
-        hug.test.get(hug_api, "cors_supported").headers_dict["Access-Control-Allow-Origin"] == "*"
+        hug_core.test.get(hug_core_api, "cors_supported").headers_dict["Access-Control-Allow-Origin"] == "*"
     )

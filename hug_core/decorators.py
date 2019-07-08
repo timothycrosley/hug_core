@@ -1,4 +1,4 @@
-"""hug/decorators.py
+"""hug_core/decorators.py
 
 Defines the method decorators at the core of Hug's approach to creating HTTP APIs
 
@@ -29,11 +29,11 @@ from __future__ import absolute_import
 import functools
 from collections import namedtuple
 
-import hug.api
-import hug.defaults
-import hug.output_format
-from hug import introspect
-from hug.format import underscore
+import hug_core.api
+import hug_core.defaults
+import hug_core.output_format
+from hug_core import introspect
+from hug_core.format import underscore
 
 
 def default_output_format(
@@ -42,14 +42,14 @@ def default_output_format(
     """A decorator that allows you to override the default output format for an API"""
 
     def decorator(formatter):
-        formatter = hug.output_format.content_type(content_type)(formatter)
+        formatter = hug_core.output_format.content_type(content_type)(formatter)
         if apply_globally:
             if http:
-                hug.defaults.output_format = formatter
+                hug_core.defaults.output_format = formatter
             if cli:
-                hug.defaults.cli_output_format = formatter
+                hug_core.defaults.cli_output_format = formatter
         else:
-            apply_to_api = hug.API(api) if api else hug.api.from_object(formatter)
+            apply_to_api = hug_core.API(api) if api else hug_core.api.from_object(formatter)
             if http:
                 apply_to_api.http.output_format = formatter
             if cli:
@@ -63,11 +63,11 @@ def default_input_format(content_type="application/json", apply_globally=False, 
     """A decorator that allows you to override the default output format for an API"""
 
     def decorator(formatter):
-        formatter = hug.output_format.content_type(content_type)(formatter)
+        formatter = hug_core.output_format.content_type(content_type)(formatter)
         if apply_globally:
-            hug.defaults.input_format[content_type] = formatter
+            hug_core.defaults.input_format[content_type] = formatter
         else:
-            apply_to_api = hug.API(api) if api else hug.api.from_object(formatter)
+            apply_to_api = hug_core.API(api) if api else hug_core.api.from_object(formatter)
             apply_to_api.http.set_input_format(content_type, formatter)
         return formatter
 
@@ -75,13 +75,13 @@ def default_input_format(content_type="application/json", apply_globally=False, 
 
 
 def directive(apply_globally=False, api=None):
-    """A decorator that registers a single hug directive"""
+    """A decorator that registers a single hug_core directive"""
 
     def decorator(directive_method):
         if apply_globally:
-            hug.defaults.directives[underscore(directive_method.__name__)] = directive_method
+            hug_core.defaults.directives[underscore(directive_method.__name__)] = directive_method
         else:
-            apply_to_api = hug.API(api) if api else hug.api.from_object(directive_method)
+            apply_to_api = hug_core.API(api) if api else hug_core.api.from_object(directive_method)
             apply_to_api.add_directive(directive_method)
         directive_method.directive = True
         return directive_method
@@ -90,13 +90,13 @@ def directive(apply_globally=False, api=None):
 
 
 def context_factory(apply_globally=False, api=None):
-    """A decorator that registers a single hug context factory"""
+    """A decorator that registers a single hug_core context factory"""
 
     def decorator(context_factory_):
         if apply_globally:
-            hug.defaults.context_factory = context_factory_
+            hug_core.defaults.context_factory = context_factory_
         else:
-            apply_to_api = hug.API(api) if api else hug.api.from_object(context_factory_)
+            apply_to_api = hug_core.API(api) if api else hug_core.api.from_object(context_factory_)
             apply_to_api.context_factory = context_factory_
         return context_factory_
 
@@ -104,13 +104,13 @@ def context_factory(apply_globally=False, api=None):
 
 
 def delete_context(apply_globally=False, api=None):
-    """A decorator that registers a single hug delete context function"""
+    """A decorator that registers a single hug_core delete context function"""
 
     def decorator(delete_context_):
         if apply_globally:
-            hug.defaults.delete_context = delete_context_
+            hug_core.defaults.delete_context = delete_context_
         else:
-            apply_to_api = hug.API(api) if api else hug.api.from_object(delete_context_)
+            apply_to_api = hug_core.API(api) if api else hug_core.api.from_object(delete_context_)
             apply_to_api.delete_context = delete_context_
         return delete_context_
 
@@ -121,7 +121,7 @@ def startup(api=None):
     """Runs the provided function on startup, passing in an instance of the api"""
 
     def startup_wrapper(startup_function):
-        apply_to_api = hug.API(api) if api else hug.api.from_object(startup_function)
+        apply_to_api = hug_core.API(api) if api else hug_core.api.from_object(startup_function)
         apply_to_api.add_startup_handler(startup_function)
         return startup_function
 
@@ -132,7 +132,7 @@ def extend_api(route="", api=None, base_url="", **kwargs):
     """Extends the current api, with handlers from an imported api. Optionally provide a route that prefixes access"""
 
     def decorator(extend_with):
-        apply_to_api = hug.API(api) if api else hug.api.from_object(extend_with)
+        apply_to_api = hug_core.API(api) if api else hug_core.api.from_object(extend_with)
         for extended_api in extend_with():
             apply_to_api.extend(extended_api, route, base_url, **kwargs)
         return extend_with

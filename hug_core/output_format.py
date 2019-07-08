@@ -1,4 +1,4 @@
-"""hug/output_format.py
+"""hug_core/output_format.py
 
 Defines Hug's built-in output formatting methods
 
@@ -33,9 +33,9 @@ from io import BytesIO
 from operator import itemgetter
 from uuid import UUID
 
-from hug import introspect
-from hug.format import camelcase, content_type
-from hug.json_module import json as json_converter
+from hug_core import introspect
+from hug_core.format import camelcase, content_type
+from hug_core.json_module import json as json_converter
 
 try:
     import numpy

@@ -1,4 +1,4 @@
-"""hug/_empty.py
+"""hug_core/_empty.py
 
 Defines a set of empty types for use within hug, to ensure extra memory / processing isn't taken creating empty types
 as default values.

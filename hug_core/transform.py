@@ -1,4 +1,4 @@
-"""hug/transform.py
+"""hug_core/transform.py
 
 Defines Hug's built-in output transforming functions
 
@@ -21,7 +21,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 """
 from __future__ import absolute_import
 
-from hug.decorators import auto_kwargs
+from hug_core.decorators import auto_kwargs
 
 
 def all(*transformers):

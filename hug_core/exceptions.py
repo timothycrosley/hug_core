@@ -1,4 +1,4 @@
-"""hug/exceptions.py
+"""hug_core/exceptions.py
 
 Defines the custom exceptions that are part of, and support
 

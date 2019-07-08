@@ -1,6 +1,6 @@
 """tests/test_output_format.py
 
-Tests that the hug routing functionality works as expected
+Tests that the hug_core routing functionality works as expected
 
 Copyright (C) 2016 Timothy Edmund Crosley
 
@@ -19,8 +19,8 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 OTHER DEALINGS IN THE SOFTWARE.
 
 """
-import hug
-from hug.routing import (
+import hug_core
+from hug_core.routing import (
     CLIRouter,
     ExceptionRouter,
     HTTPRouter,
@@ -33,7 +33,7 @@ from hug.routing import (
     URLRouter,
 )
 
-api = hug.API(__name__)
+api = hug_core.API(__name__)
 
 
 class TestRouter(object):
@@ -135,8 +135,8 @@ class TestInternalValidation(TestRouter):
     def test_output_invalid(self):
         """Test to ensure output_invalid handler can be changed on the fly"""
         assert (
-            self.route.output_invalid(hug.output_format.json).route["output_invalid"]
-            == hug.output_format.json
+            self.route.output_invalid(hug_core.output_format.json).route["output_invalid"]
+            == hug_core.output_format.json
         )
 
 
@@ -381,11 +381,11 @@ class TestURLRouter(TestHTTPRouter):
 
     def test_call(self):
         """Test to ensure the HTTP METHOD can be set to accept all on the fly"""
-        assert self.route.call().route["accept"] == hug.HTTP_METHODS
+        assert self.route.call().route["accept"] == hug_core.HTTP_METHODS
 
     def test_http(self):
         """Test to ensure the HTTP METHOD can be set to accept all on the fly"""
-        assert self.route.http().route["accept"] == hug.HTTP_METHODS
+        assert self.route.http().route["accept"] == hug_core.HTTP_METHODS
 
     def test_get_post(self):
         """Test to ensure the HTTP METHOD can be set to GET & POST in one call"""
@@ -407,9 +407,9 @@ class TestURLRouter(TestHTTPRouter):
         """Test to ensure setting suffixes works as expected"""
         assert self.route.suffixes(".js", ".xml").route["suffixes"] == (".js", ".xml")
 
-    def test_allow_origins_request_handling(self, hug_api):
+    def test_allow_origins_request_handling(self, hug_core_api):
         """Test to ensure a route with allowed origins works as expected"""
-        route = URLRouter(api=hug_api)
+        route = URLRouter(api=hug_core_api)
         test_headers = route.allow_origins(
             "google.com", methods=("GET", "POST"), credentials=True, headers="OPTIONS", max_age=10
         )
@@ -418,4 +418,4 @@ class TestURLRouter(TestHTTPRouter):
         def my_endpoint():
             return "Success"
 
-        assert hug.test.get(hug_api, "/my_endpoint", headers={'ORIGIN': 'google.com'}).data == "Success"
+        assert hug_core.test.get(hug_core_api, "/my_endpoint", headers={'ORIGIN': 'google.com'}).data == "Success"

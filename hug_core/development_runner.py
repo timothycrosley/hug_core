@@ -1,6 +1,6 @@
-"""hug/development_runner.py
+"""hug_core/development_runner.py
 
-Contains logic to enable execution of hug APIS locally from the command line for development use
+Contains logic to enable execution of hug_core APIS locally from the command line for development use
 
 Copyright (C) 2016  Timothy Edmund Crosley
 
@@ -30,10 +30,10 @@ from multiprocessing import Process
 from os.path import exists
 
 import _thread as thread
-from hug._version import current
-from hug.api import API
-from hug.route import cli
-from hug.types import boolean, number
+from hug_core._version import current
+from hug_core.api import API
+from hug_core.route import cli
+from hug_core.types import boolean, number
 
 INIT_MODULES = list(sys.modules.keys())
 
@@ -43,7 +43,7 @@ def _start_api(api_module, host, port, no_404_documentation, show_intro=True):
 
 
 @cli(version=current)
-def hug(
+def hug_core(
     file: "A Python file that contains a Hug API" = None,
     module: "A Python module that contains a Hug API" = None,
     host: "Interface to bind to" = "",
@@ -66,7 +66,7 @@ def hug(
     elif module:
         sys.path.append(os.getcwd())
         api_module = importlib.import_module(module)
-    if not api_module or not hasattr(api_module, "__hug__"):
+    if not api_module or not hasattr(api_module, "__hug_core__"):
         print("Error: must define a file name or module that contains a Hug API.")
         sys.exit(1)
 

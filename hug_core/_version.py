@@ -1,4 +1,4 @@
-"""hug/_version.py
+"""hug_core/_version.py
 
 Defines hug version information
 

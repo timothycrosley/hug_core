@@ -1,4 +1,4 @@
-"""hug/store.py.
+"""hug_core/store.py.
 
 A collecton of native stores which can be used with, among others, the session middleware.
 
@@ -19,13 +19,13 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 OTHER DEALINGS IN THE SOFTWARE.
 
 """
-from hug.exceptions import StoreKeyNotFound
+from hug_core.exceptions import StoreKeyNotFound
 
 
 class InMemoryStore:
     """
     Naive store class which can be used for the session middleware and unit tests.
-    It is not thread-safe and no data will survive the lifecycle of the hug process.
+    It is not thread-safe and no data will survive the lifecycle of the hug_core process.
     Regard this as a blueprint for more useful and probably more complex store implementations, for example stores
     which make use of databases like Redis, PostgreSQL or others.
     """
@@ -34,7 +34,7 @@ class InMemoryStore:
         self._data = {}
 
     def get(self, key):
-        """Get data for given store key. Raise hug.exceptions.StoreKeyNotFound if key does not exist."""
+        """Get data for given store key. Raise hug_core.exceptions.StoreKeyNotFound if key does not exist."""
         try:
             data = self._data[key]
         except KeyError:

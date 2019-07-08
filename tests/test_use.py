@@ -1,6 +1,6 @@
 """tests/test_use.py.
 
-Tests to ensure hugs service consuming classes, that are the backbone of the seamless micro-service concept,
+Tests to ensure hug_cores service consuming classes, that are the backbone of the seamless micro-service concept,
 work as intended
 
 Copyright (C) 2016 Timothy Edmund Crosley
@@ -26,8 +26,8 @@ import struct
 import pytest
 import requests
 
-import hug
-from hug import use
+import hug_core
+from hug_core import use
 
 
 class TestService(object):
@@ -118,13 +118,13 @@ class TestHTTP(object):
 
 
 class TestLocal(object):
-    """Test to ensure the Local Service object enables pulling data from internal hug APIs with minimal overhead"""
+    """Test to ensure the Local Service object enables pulling data from internal hug_core APIs with minimal overhead"""
 
     service = use.Local(__name__)
 
     def test_init(self):
         """Test to ensure the Local service instantiation populates the expected attributes"""
-        assert isinstance(self.service.api, hug.API)
+        assert isinstance(self.service.api, hug_core.API)
 
     def test_request(self):
         """Test to ensure requesting data from a local service works as expected"""
@@ -225,16 +225,16 @@ class TestSocket(object):
         )
 
 
-@hug.get()
+@hug_core.get()
 def hello_world():
     return "Hi!"
 
 
-@hug.get()
+@hug_core.get()
 def exception(response):
-    response.status = hug.HTTP_500
+    response.status = hug_core.HTTP_500
 
 
-@hug.get()
+@hug_core.get()
 def validation_error(data):
     return data

@@ -1,4 +1,4 @@
-"""hug/routing.py
+"""hug_core/routing.py
 
 Defines the chainable classes responsible for defining the routing of Python functions for use with Falcon
 and CLIs
@@ -31,11 +31,11 @@ from urllib.parse import urljoin
 import falcon
 from falcon import HTTP_METHODS
 
-import hug.api
-import hug.interface
-import hug.output_format
-from hug import introspect
-from hug.exceptions import InvalidTypeData
+import hug_core.api
+import hug_core.interface
+import hug_core.output_format
+from hug_core import introspect
+from hug_core.exceptions import InvalidTypeData
 
 
 class Router(object):
@@ -175,6 +175,6 @@ class LocalRouter(InternalValidation):
         return self.where(version=supported)
 
     def __call__(self, api_function):
-        """Enables exposing a hug compatible function locally"""
-        return hug.interface.Local(self.route, api_function)
+        """Enables exposing a hug_core compatible function locally"""
+        return hug_core.interface.Local(self.route, api_function)
 

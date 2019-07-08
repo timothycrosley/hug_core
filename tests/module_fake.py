@@ -1,84 +1,84 @@
 """Fake HUG API module usable for testing importation of modules"""
-import hug
+import hug_core
 
 
 class FakeException(BaseException):
     pass
 
 
-@hug.directive(apply_globally=False)
+@hug_core.directive(apply_globally=False)
 def my_directive(default=None, **kwargs):
     """for testing"""
     return default
 
 
-@hug.default_input_format("application/made-up")
+@hug_core.default_input_format("application/made-up")
 def made_up_formatter(data):
     """for testing"""
     return data
 
 
-@hug.default_output_format()
+@hug_core.default_output_format()
 def output_formatter(data):
     """for testing"""
-    return hug.output_format.json(data)
+    return hug_core.output_format.json(data)
 
 
-@hug.get()
-def made_up_api(hug_my_directive=True):
+@hug_core.get()
+def made_up_api(hug_core_my_directive=True):
     """for testing"""
-    return hug_my_directive
+    return hug_core_my_directive
 
 
-@hug.directive(apply_globally=True)
+@hug_core.directive(apply_globally=True)
 def my_directive_global(default=None, **kwargs):
     """for testing"""
     return default
 
 
-@hug.default_input_format("application/made-up", apply_globally=True)
+@hug_core.default_input_format("application/made-up", apply_globally=True)
 def made_up_formatter_global(data):
     """for testing"""
     return data
 
 
-@hug.default_output_format(apply_globally=True)
+@hug_core.default_output_format(apply_globally=True)
 def output_formatter_global(data, request=None, response=None):
     """for testing"""
-    return hug.output_format.json(data)
+    return hug_core.output_format.json(data)
 
 
-@hug.request_middleware()
+@hug_core.request_middleware()
 def handle_request(request, response):
     """for testing"""
     return
 
 
-@hug.startup()
+@hug_core.startup()
 def on_startup(api):
     """for testing"""
     return
 
 
-@hug.static()
+@hug_core.static()
 def static():
     """for testing"""
     return ("",)
 
 
-@hug.sink("/all")
+@hug_core.sink("/all")
 def sink(path):
     """for testing"""
     return path
 
 
-@hug.exception(FakeException)
+@hug_core.exception(FakeException)
 def handle_exception(exception):
     """Handles the provided exception for testing"""
     return True
 
 
-@hug.not_found()
+@hug_core.not_found()
 def not_found_handler():
     """for testing"""
     return True

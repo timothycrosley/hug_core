@@ -4,7 +4,7 @@ import pytest
 from marshmallow import Schema, fields
 from marshmallow.decorators import post_dump
 
-import hug
+import hug_core
 
 module = sys.modules[__name__]
 
@@ -22,11 +22,11 @@ class TestContextFactoryLocal(object):
     def test_lack_requirement(self):
         self.custom_context = dict(test="context")
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return self.custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, exception=None, errors=None, lacks_requirement=None):
             assert context == self.custom_context
             assert not exception
@@ -41,7 +41,7 @@ class TestContextFactoryLocal(object):
             self.custom_context["launched_requirement"] = True
             return RequirementFailed()
 
-        @hug.local(requires=test_local_requirement)
+        @hug_core.local(requires=test_local_requirement)
         def requirement_local_function():
             self.custom_context["launched_local_function"] = True
 
@@ -53,21 +53,21 @@ class TestContextFactoryLocal(object):
     def test_directive(self):
         custom_context = dict(test="context")
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, **kwargs):
             pass
 
-        @hug.directive()
+        @hug_core.directive()
         def custom_directive(**kwargs):
             assert "context" in kwargs
             assert kwargs["context"] == custom_context
             return "custom"
 
-        @hug.local()
+        @hug_core.local()
         def directive_local_function(custom: custom_directive):
             assert custom == "custom"
 
@@ -76,11 +76,11 @@ class TestContextFactoryLocal(object):
     def test_validation(self):
         custom_context = dict(test="context", not_valid_number=43)
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, exception=None, errors=None, lacks_requirement=None):
             assert context == custom_context
             assert not exception
@@ -94,14 +94,14 @@ class TestContextFactoryLocal(object):
             custom_context["launched_requirement"] = True
             return RequirementFailed()
 
-        @hug.type(extend=hug.types.number, accept_context=True)
+        @hug_core.type(extend=hug_core.types.number, accept_context=True)
         def custom_number_test(value, context):
             assert context == custom_context
             if value == context["not_valid_number"]:
                 raise ValueError("not valid number")
             return value
 
-        @hug.local()
+        @hug_core.local()
         def validation_local_function(value: custom_number_test):
             custom_context["launched_local_function"] = value
 
@@ -112,11 +112,11 @@ class TestContextFactoryLocal(object):
     def test_transform(self):
         custom_context = dict(test="context", test_number=43)
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, exception=None, errors=None, lacks_requirement=None):
             assert context == custom_context
             assert not exception
@@ -132,7 +132,7 @@ class TestContextFactoryLocal(object):
                 assert self.context["test"] == "context"
                 self.context["test_number"] += 1
 
-        @hug.local()
+        @hug_core.local()
         def validation_local_function() -> UserSchema():
             return {"name": "test"}
 
@@ -143,11 +143,11 @@ class TestContextFactoryLocal(object):
     def test_exception(self):
         custom_context = dict(test="context")
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, exception=None, errors=None, lacks_requirement=None):
             assert context == custom_context
             assert exception
@@ -156,7 +156,7 @@ class TestContextFactoryLocal(object):
             assert not lacks_requirement
             custom_context["launched_delete_context"] = True
 
-        @hug.local()
+        @hug_core.local()
         def exception_local_function():
             custom_context["launched_local_function"] = True
             raise CustomException()
@@ -170,11 +170,11 @@ class TestContextFactoryLocal(object):
     def test_success(self):
         custom_context = dict(test="context")
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, exception=None, errors=None, lacks_requirement=None):
             assert context == custom_context
             assert not exception
@@ -182,7 +182,7 @@ class TestContextFactoryLocal(object):
             assert not lacks_requirement
             custom_context["launched_delete_context"] = True
 
-        @hug.local()
+        @hug_core.local()
         def success_local_function():
             custom_context["launched_local_function"] = True
 
@@ -196,11 +196,11 @@ class TestContextFactoryCLI(object):
     def test_lack_requirement(self):
         custom_context = dict(test="context")
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, exception=None, errors=None, lacks_requirement=None):
             assert context == custom_context
             assert not exception
@@ -215,11 +215,11 @@ class TestContextFactoryCLI(object):
             custom_context["launched_requirement"] = True
             return RequirementFailed()
 
-        @hug.cli(requires=test_requirement)
+        @hug_core.cli(requires=test_requirement)
         def requirement_local_function():
             custom_context["launched_local_function"] = True
 
-        hug.test.cli(requirement_local_function)
+        hug_core.test.cli(requirement_local_function)
         assert "launched_local_function" not in custom_context
         assert "launched_requirement" in custom_context
         assert "launched_delete_context" in custom_context
@@ -227,34 +227,34 @@ class TestContextFactoryCLI(object):
     def test_directive(self):
         custom_context = dict(test="context")
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, **kwargs):
             pass
 
-        @hug.directive()
+        @hug_core.directive()
         def custom_directive(**kwargs):
             assert "context" in kwargs
             assert kwargs["context"] == custom_context
             return "custom"
 
-        @hug.cli()
+        @hug_core.cli()
         def directive_local_function(custom: custom_directive):
             assert custom == "custom"
 
-        hug.test.cli(directive_local_function)
+        hug_core.test.cli(directive_local_function)
 
     def test_validation(self):
         custom_context = dict(test="context", not_valid_number=43)
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, exception=None, errors=None, lacks_requirement=None):
             assert not exception
             assert context == custom_context
@@ -268,31 +268,31 @@ class TestContextFactoryCLI(object):
             custom_context["launched_requirement"] = True
             return RequirementFailed()
 
-        @hug.type(extend=hug.types.number, accept_context=True)
+        @hug_core.type(extend=hug_core.types.number, accept_context=True)
         def new_custom_number_test(value, context):
             assert context == custom_context
             if value == context["not_valid_number"]:
                 raise ValueError("not valid number")
             return value
 
-        @hug.cli()
-        def validation_local_function(value: hug.types.number):
+        @hug_core.cli()
+        def validation_local_function(value: hug_core.types.number):
             custom_context["launched_local_function"] = value
             return 0
 
         with pytest.raises(SystemExit):
-            hug.test.cli(validation_local_function, "xxx")
+            hug_core.test.cli(validation_local_function, "xxx")
         assert "launched_local_function" not in custom_context
         assert "launched_delete_context" in custom_context
 
     def test_transform(self):
         custom_context = dict(test="context", test_number=43)
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, exception=None, errors=None, lacks_requirement=None):
             assert not exception
             assert context == custom_context
@@ -308,12 +308,12 @@ class TestContextFactoryCLI(object):
                 assert self.context["test"] == "context"
                 self.context["test_number"] += 1
 
-        @hug.cli()
+        @hug_core.cli()
         def transform_cli_function() -> UserSchema():
             custom_context["launched_cli_function"] = True
             return {"name": "test"}
 
-        hug.test.cli(transform_cli_function)
+        hug_core.test.cli(transform_cli_function)
         assert "launched_cli_function" in custom_context
         assert "launched_delete_context" in custom_context
         assert "test_number" in custom_context
@@ -322,11 +322,11 @@ class TestContextFactoryCLI(object):
     def test_exception(self):
         custom_context = dict(test="context")
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, exception=None, errors=None, lacks_requirement=None):
             assert context == custom_context
             assert exception
@@ -335,12 +335,12 @@ class TestContextFactoryCLI(object):
             assert not lacks_requirement
             custom_context["launched_delete_context"] = True
 
-        @hug.cli()
+        @hug_core.cli()
         def exception_local_function():
             custom_context["launched_local_function"] = True
             raise CustomException()
 
-        hug.test.cli(exception_local_function)
+        hug_core.test.cli(exception_local_function)
 
         assert "launched_local_function" in custom_context
         assert "launched_delete_context" in custom_context
@@ -348,11 +348,11 @@ class TestContextFactoryCLI(object):
     def test_success(self):
         custom_context = dict(test="context")
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, exception=None, errors=None, lacks_requirement=None):
             assert context == custom_context
             assert not exception
@@ -360,11 +360,11 @@ class TestContextFactoryCLI(object):
             assert not lacks_requirement
             custom_context["launched_delete_context"] = True
 
-        @hug.cli()
+        @hug_core.cli()
         def success_local_function():
             custom_context["launched_local_function"] = True
 
-        hug.test.cli(success_local_function)
+        hug_core.test.cli(success_local_function)
 
         assert "launched_local_function" in custom_context
         assert "launched_delete_context" in custom_context
@@ -374,11 +374,11 @@ class TestContextFactoryHTTP(object):
     def test_lack_requirement(self):
         custom_context = dict(test="context")
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, exception=None, errors=None, lacks_requirement=None):
             assert context == custom_context
             assert not exception
@@ -392,11 +392,11 @@ class TestContextFactoryHTTP(object):
             custom_context["launched_requirement"] = True
             return "requirement_failed"
 
-        @hug.get("/requirement_function", requires=test_requirement)
+        @hug_core.get("/requirement_function", requires=test_requirement)
         def requirement_http_function():
             custom_context["launched_local_function"] = True
 
-        hug.test.get(module, "/requirement_function")
+        hug_core.test.get(module, "/requirement_function")
         assert "launched_local_function" not in custom_context
         assert "launched_requirement" in custom_context
         assert "launched_delete_context" in custom_context
@@ -404,34 +404,34 @@ class TestContextFactoryHTTP(object):
     def test_directive(self):
         custom_context = dict(test="context")
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, **kwargs):
             pass
 
-        @hug.directive()
+        @hug_core.directive()
         def custom_directive(**kwargs):
             assert "context" in kwargs
             assert kwargs["context"] == custom_context
             return "custom"
 
-        @hug.get("/directive_function")
+        @hug_core.get("/directive_function")
         def directive_http_function(custom: custom_directive):
             assert custom == "custom"
 
-        hug.test.get(module, "/directive_function")
+        hug_core.test.get(module, "/directive_function")
 
     def test_validation(self):
         custom_context = dict(test="context", not_valid_number=43)
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, exception=None, errors=None, lacks_requirement=None):
             assert context == custom_context
             assert not exception
@@ -445,29 +445,29 @@ class TestContextFactoryHTTP(object):
             custom_context["launched_requirement"] = True
             return RequirementFailed()
 
-        @hug.type(extend=hug.types.number, accept_context=True)
+        @hug_core.type(extend=hug_core.types.number, accept_context=True)
         def custom_number_test(value, context):
             assert context == custom_context
             if value == context["not_valid_number"]:
                 raise ValueError("not valid number")
             return value
 
-        @hug.get("/validation_function")
+        @hug_core.get("/validation_function")
         def validation_http_function(value: custom_number_test):
             custom_context["launched_local_function"] = value
 
-        hug.test.get(module, "/validation_function", 43)
+        hug_core.test.get(module, "/validation_function", 43)
         assert "launched_local_function " not in custom_context
         assert "launched_delete_context" in custom_context
 
     def test_transform(self):
         custom_context = dict(test="context", test_number=43)
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, exception=None, errors=None, lacks_requirement=None):
             assert context == custom_context
             assert not exception
@@ -483,11 +483,11 @@ class TestContextFactoryHTTP(object):
                 assert self.context["test"] == "context"
                 self.context["test_number"] += 1
 
-        @hug.get("/validation_function")
+        @hug_core.get("/validation_function")
         def validation_http_function() -> UserSchema():
             custom_context["launched_local_function"] = True
 
-        hug.test.get(module, "/validation_function", 43)
+        hug_core.test.get(module, "/validation_function", 43)
         assert "launched_local_function" in custom_context
         assert "launched_delete_context" in custom_context
         assert "test_number" in custom_context
@@ -496,11 +496,11 @@ class TestContextFactoryHTTP(object):
     def test_exception(self):
         custom_context = dict(test="context")
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, exception=None, errors=None, lacks_requirement=None):
             assert context == custom_context
             assert exception
@@ -509,13 +509,13 @@ class TestContextFactoryHTTP(object):
             assert not lacks_requirement
             custom_context["launched_delete_context"] = True
 
-        @hug.get("/exception_function")
+        @hug_core.get("/exception_function")
         def exception_http_function():
             custom_context["launched_local_function"] = True
             raise CustomException()
 
         with pytest.raises(CustomException):
-            hug.test.get(module, "/exception_function")
+            hug_core.test.get(module, "/exception_function")
 
         assert "launched_local_function" in custom_context
         assert "launched_delete_context" in custom_context
@@ -523,11 +523,11 @@ class TestContextFactoryHTTP(object):
     def test_success(self):
         custom_context = dict(test="context")
 
-        @hug.context_factory()
+        @hug_core.context_factory()
         def return_context(**kwargs):
             return custom_context
 
-        @hug.delete_context()
+        @hug_core.delete_context()
         def delete_context(context, exception=None, errors=None, lacks_requirement=None):
             assert context == custom_context
             assert not exception
@@ -535,11 +535,11 @@ class TestContextFactoryHTTP(object):
             assert not lacks_requirement
             custom_context["launched_delete_context"] = True
 
-        @hug.get("/success_function")
+        @hug_core.get("/success_function")
         def success_http_function():
             custom_context["launched_local_function"] = True
 
-        hug.test.get(module, "/success_function")
+        hug_core.test.get(module, "/success_function")
 
         assert "launched_local_function" in custom_context
         assert "launched_delete_context" in custom_context

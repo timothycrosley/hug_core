@@ -1,9 +1,9 @@
-"""hug/directives.py
+"""hug_core/directives.py
 
-Defines the directives built into hug. Directives allow attaching behaviour to an API handler based simply
+Defines the directives built into hug_core. Directives allow attaching behaviour to an API handler based simply
 on an argument it takes and that arguments default value. The directive gets called with the default supplied,
 ther request data, and api_version. The result of running the directive method is then set as the argument value.
-Directive attributes are always prefixed with 'hug_'
+Directive attributes are always prefixed with 'hug_core_'
 
 Copyright (C) 2016  Timothy Edmund Crosley
 
@@ -27,7 +27,7 @@ from __future__ import absolute_import
 from functools import partial
 from timeit import default_timer as python_timer
 
-from hug import introspect
+from hug_core import introspect
 
 
 def _built_in_directive(directive):
@@ -65,7 +65,7 @@ class Timer(object):
 
 @_built_in_directive
 def module(default=None, api=None, **kwargs):
-    """Returns the module that is running this hug API function"""
+    """Returns the module that is running this hug_core API function"""
     return api.module if api else default
 
 
@@ -107,9 +107,9 @@ class CurrentAPI(object):
             raise AttributeError("API Function {0} not found".format(name))
 
         accepts = function.interface.arguments
-        if "hug_api_version" in accepts:
-            function = partial(function, hug_api_version=self.api_version)
-        if "hug_current_api" in accepts:
-            function = partial(function, hug_current_api=self)
+        if "hug_core_api_version" in accepts:
+            function = partial(function, hug_core_api_version=self.api_version)
+        if "hug_core_current_api" in accepts:
+            function = partial(function, hug_core_current_api=self)
 
         return function

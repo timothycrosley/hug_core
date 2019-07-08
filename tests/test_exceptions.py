@@ -21,21 +21,21 @@ OTHER DEALINGS IN THE SOFTWARE.
 """
 import pytest
 
-import hug
+import hug_core
 
 
 def test_invalid_type_data():
     try:
-        raise hug.exceptions.InvalidTypeData("not a good type")
-    except hug.exceptions.InvalidTypeData as exception:
+        raise hug_core.exceptions.InvalidTypeData("not a good type")
+    except hug_core.exceptions.InvalidTypeData as exception:
         error = exception
 
     assert error.message == "not a good type"
     assert error.reasons is None
 
     try:
-        raise hug.exceptions.InvalidTypeData("not a good type", [1, 2, 3])
-    except hug.exceptions.InvalidTypeData as exception:
+        raise hug_core.exceptions.InvalidTypeData("not a good type", [1, 2, 3])
+    except hug_core.exceptions.InvalidTypeData as exception:
         error = exception
 
     assert error.message == "not a good type"
@@ -43,6 +43,6 @@ def test_invalid_type_data():
 
     with pytest.raises(Exception):
         try:
-            raise hug.exceptions.InvalidTypeData()
-        except hug.exceptions.InvalidTypeData as exception:
+            raise hug_core.exceptions.InvalidTypeData()
+        except hug_core.exceptions.InvalidTypeData as exception:
             pass

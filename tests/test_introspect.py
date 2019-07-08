@@ -1,6 +1,6 @@
 """tests/test_input_format.py.
 
-Tests that hugs built in introspection helper functions work as expected
+Tests that hug_cores built in introspection helper functions work as expected
 
 Copyright (C) 2016 Timothy Edmund Crosley
 
@@ -19,7 +19,7 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 OTHER DEALINGS IN THE SOFTWARE.
 
 """
-import hug
+import hug_core
 
 
 def function_with_kwargs(argument1, **kwargs):
@@ -48,21 +48,21 @@ class Object(object):
 
 
 def test_is_method():
-    """Test to ensure hugs introspection can correctly identify the difference between a function and method"""
-    assert not hug.introspect.is_method(function_with_kwargs)
-    assert hug.introspect.is_method(Object().my_method)
+    """Test to ensure hug_cores introspection can correctly identify the difference between a function and method"""
+    assert not hug_core.introspect.is_method(function_with_kwargs)
+    assert hug_core.introspect.is_method(Object().my_method)
 
 
 def test_arguments():
-    """Test to ensure hug introspection can correctly pull out arguments from a function definition"""
+    """Test to ensure hug_core introspection can correctly pull out arguments from a function definition"""
 
     def function(argument1, argument2):
         pass
 
-    assert tuple(hug.introspect.arguments(function_with_kwargs)) == ("argument1",)
-    assert tuple(hug.introspect.arguments(function_with_args)) == ("argument1",)
-    assert tuple(hug.introspect.arguments(function_with_neither)) == ("argument1", "argument2")
-    assert tuple(hug.introspect.arguments(function_with_both)) == (
+    assert tuple(hug_core.introspect.arguments(function_with_kwargs)) == ("argument1",)
+    assert tuple(hug_core.introspect.arguments(function_with_args)) == ("argument1",)
+    assert tuple(hug_core.introspect.arguments(function_with_neither)) == ("argument1", "argument2")
+    assert tuple(hug_core.introspect.arguments(function_with_both)) == (
         "argument1",
         "argument2",
         "argument3",
@@ -70,74 +70,74 @@ def test_arguments():
 
 
 def test_takes_kwargs():
-    """Test to ensure hug introspection can correctly identify when a function takes kwargs"""
-    assert hug.introspect.takes_kwargs(function_with_kwargs)
-    assert not hug.introspect.takes_kwargs(function_with_args)
-    assert not hug.introspect.takes_kwargs(function_with_neither)
-    assert hug.introspect.takes_kwargs(function_with_both)
+    """Test to ensure hug_core introspection can correctly identify when a function takes kwargs"""
+    assert hug_core.introspect.takes_kwargs(function_with_kwargs)
+    assert not hug_core.introspect.takes_kwargs(function_with_args)
+    assert not hug_core.introspect.takes_kwargs(function_with_neither)
+    assert hug_core.introspect.takes_kwargs(function_with_both)
 
 
 def test_takes_args():
-    """Test to ensure hug introspection can correctly identify when a function takes args"""
-    assert not hug.introspect.takes_args(function_with_kwargs)
-    assert hug.introspect.takes_args(function_with_args)
-    assert not hug.introspect.takes_args(function_with_neither)
-    assert hug.introspect.takes_args(function_with_both)
+    """Test to ensure hug_core introspection can correctly identify when a function takes args"""
+    assert not hug_core.introspect.takes_args(function_with_kwargs)
+    assert hug_core.introspect.takes_args(function_with_args)
+    assert not hug_core.introspect.takes_args(function_with_neither)
+    assert hug_core.introspect.takes_args(function_with_both)
 
 
 def test_takes_arguments():
-    """Test to ensure hug introspection can correctly identify which arguments supplied a function will take"""
-    assert hug.introspect.takes_arguments(function_with_kwargs, "argument1", "argument3") == set(
+    """Test to ensure hug_core introspection can correctly identify which arguments supplied a function will take"""
+    assert hug_core.introspect.takes_arguments(function_with_kwargs, "argument1", "argument3") == set(
         ("argument1",)
     )
-    assert hug.introspect.takes_arguments(function_with_args, "bacon") == set()
-    assert hug.introspect.takes_arguments(function_with_neither, "argument1", "argument2") == set(
+    assert hug_core.introspect.takes_arguments(function_with_args, "bacon") == set()
+    assert hug_core.introspect.takes_arguments(function_with_neither, "argument1", "argument2") == set(
         ("argument1", "argument2")
     )
-    assert hug.introspect.takes_arguments(function_with_both, "argument3", "bacon") == set(
+    assert hug_core.introspect.takes_arguments(function_with_both, "argument3", "bacon") == set(
         ("argument3",)
     )
 
 
 def test_takes_all_arguments():
-    """Test to ensure hug introspection can correctly identify if a function takes all specified arguments"""
-    assert not hug.introspect.takes_all_arguments(
+    """Test to ensure hug_core introspection can correctly identify if a function takes all specified arguments"""
+    assert not hug_core.introspect.takes_all_arguments(
         function_with_kwargs, "argument1", "argument2", "argument3"
     )
-    assert not hug.introspect.takes_all_arguments(
+    assert not hug_core.introspect.takes_all_arguments(
         function_with_args, "argument1", "argument2", "argument3"
     )
-    assert not hug.introspect.takes_all_arguments(
+    assert not hug_core.introspect.takes_all_arguments(
         function_with_neither, "argument1", "argument2", "argument3"
     )
-    assert hug.introspect.takes_all_arguments(
+    assert hug_core.introspect.takes_all_arguments(
         function_with_both, "argument1", "argument2", "argument3"
     )
 
 
 def test_generate_accepted_kwargs():
-    """Test to ensure hug introspection can correctly dynamically filter out kwargs for only those accepted"""
+    """Test to ensure hug_core introspection can correctly dynamically filter out kwargs for only those accepted"""
     source_dictionary = {"argument1": 1, "argument2": 2, "hey": "there", "hi": "hello"}
 
-    kwargs = hug.introspect.generate_accepted_kwargs(function_with_kwargs, "bacon", "argument1")(
+    kwargs = hug_core.introspect.generate_accepted_kwargs(function_with_kwargs, "bacon", "argument1")(
         source_dictionary
     )
     assert kwargs == source_dictionary
 
-    kwargs = hug.introspect.generate_accepted_kwargs(function_with_args, "bacon", "argument1")(
+    kwargs = hug_core.introspect.generate_accepted_kwargs(function_with_args, "bacon", "argument1")(
         source_dictionary
     )
     assert kwargs == {"argument1": 1}
 
-    kwargs = hug.introspect.generate_accepted_kwargs(
+    kwargs = hug_core.introspect.generate_accepted_kwargs(
         function_with_neither, "argument1", "argument2"
     )(source_dictionary)
     assert kwargs == {"argument1": 1, "argument2": 2}
 
-    kwargs = hug.introspect.generate_accepted_kwargs(function_with_both, "argument1", "argument2")(
+    kwargs = hug_core.introspect.generate_accepted_kwargs(function_with_both, "argument1", "argument2")(
         source_dictionary
     )
     assert kwargs == source_dictionary
 
-    kwargs = hug.introspect.generate_accepted_kwargs(function_with_nothing)(source_dictionary)
+    kwargs = hug_core.introspect.generate_accepted_kwargs(function_with_nothing)(source_dictionary)
     assert kwargs == {}

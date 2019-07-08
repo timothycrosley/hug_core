@@ -1,6 +1,6 @@
-"""hug/types.py
+"""hug_core/types.py
 
-Defines hugs built-in supported types / validators
+Defines hug_cores built-in supported types / validators
 
 Copyright (C) 2016  Timothy Edmund Crosley
 
@@ -25,10 +25,10 @@ import uuid as native_uuid
 from decimal import Decimal
 from distutils.version import LooseVersion
 
-import hug._empty as empty
-from hug import introspect
-from hug.exceptions import InvalidTypeData
-from hug.json_module import json as json_converter
+import hug_core._empty as empty
+from hug_core import introspect
+from hug_core.exceptions import InvalidTypeData
+from hug_core.json_module import json as json_converter
 
 MARSHMALLOW_MAJOR_VERSION = None
 try:
@@ -45,11 +45,11 @@ except ImportError:
 
 
 class Type(object):
-    """Defines the base hug concept of a type for use in function annotation.
+    """Defines the base hug_core concept of a type for use in function annotation.
        Override `__call__` to define how the type should be transformed and validated
     """
 
-    _hug_type = True
+    _hug_core_type = True
     _sub_type = None
     _accept_context = False
 
@@ -209,7 +209,7 @@ def create(
 
 
 def accept(kind, doc=None, error_text=None, exception_handlers=empty.dict, accept_context=False):
-    """Allows quick wrapping of any Python type cast function for use as a hug type annotation"""
+    """Allows quick wrapping of any Python type cast function for use as a hug_core type annotation"""
     return create(
         doc,
         error_text,
@@ -613,7 +613,7 @@ class TypedProperty(object):
 
 
 class NewTypeMeta(type):
-    """Meta class to turn Schema objects into format usable by hug"""
+    """Meta class to turn Schema objects into format usable by hug_core"""
 
     __slots__ = ()
 
@@ -621,7 +621,7 @@ class NewTypeMeta(type):
         cls._types = {
             attr: getattr(cls, attr)
             for attr in dir(cls)
-            if getattr(getattr(cls, attr), "_hug_type", False)
+            if getattr(getattr(cls, attr), "_hug_core_type", False)
         }
         slots = getattr(cls, "__slots__", ())
         slots = set(slots)
@@ -635,7 +635,7 @@ class NewTypeMeta(type):
 
 
 class Schema(object, metaclass=NewTypeMeta):
-    """Schema for creating complex types using hug types"""
+    """Schema for creating complex types using hug_core types"""
 
     __slots__ = ()
 
@@ -657,7 +657,7 @@ json = JSON()
 
 
 class MarshmallowInputSchema(Type):
-    """Allows using a Marshmallow Schema directly in a hug input type annotation"""
+    """Allows using a Marshmallow Schema directly in a hug_core input type annotation"""
 
     __slots__ = "schema"
 
@@ -695,7 +695,7 @@ class MarshmallowInputSchema(Type):
 
 
 class MarshmallowReturnSchema(Type):
-    """Allows using a Marshmallow Schema directly in a hug return type annotation"""
+    """Allows using a Marshmallow Schema directly in a hug_core return type annotation"""
 
     __slots__ = ("schema",)
 

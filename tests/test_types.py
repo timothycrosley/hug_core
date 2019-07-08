@@ -1,6 +1,6 @@
 """tests/test_types.py.
 
-Tests the type validators included with hug
+Tests the type validators included with hug_core
 
 Copyright (C) 2016 Timothy Edmund Crosley
 
@@ -29,114 +29,114 @@ import pytest
 from marshmallow import Schema, ValidationError, fields
 from marshmallow.decorators import validates_schema
 
-import hug
-from hug.exceptions import InvalidTypeData
+import hug_core
+from hug_core.exceptions import InvalidTypeData
 
-api = hug.API(__name__)
+api = hug_core.API(__name__)
 
 
 def test_type():
     """Test to ensure the abstract Type object can't be used"""
     with pytest.raises(NotImplementedError):
-        hug.types.Type()("value")
+        hug_core.types.Type()("value")
 
 
 def test_number():
-    """Tests that hug's number type correctly converts and validates input"""
-    assert hug.types.number("1") == 1
-    assert hug.types.number(1) == 1
+    """Tests that hug_core's number type correctly converts and validates input"""
+    assert hug_core.types.number("1") == 1
+    assert hug_core.types.number(1) == 1
     with pytest.raises(ValueError):
-        hug.types.number("bacon")
+        hug_core.types.number("bacon")
 
 
 def test_range():
-    """Tests that hug's range type successfully handles ranges of numbers"""
-    assert hug.types.in_range(1, 10)("1") == 1
-    assert hug.types.in_range(1, 10)(1) == 1
-    assert "1" in hug.types.in_range(1, 10).__doc__
+    """Tests that hug_core's range type successfully handles ranges of numbers"""
+    assert hug_core.types.in_range(1, 10)("1") == 1
+    assert hug_core.types.in_range(1, 10)(1) == 1
+    assert "1" in hug_core.types.in_range(1, 10).__doc__
     with pytest.raises(ValueError):
-        hug.types.in_range(1, 10)("bacon")
+        hug_core.types.in_range(1, 10)("bacon")
     with pytest.raises(ValueError):
-        hug.types.in_range(1, 10)("15")
+        hug_core.types.in_range(1, 10)("15")
     with pytest.raises(ValueError):
-        hug.types.in_range(1, 10)(-34)
+        hug_core.types.in_range(1, 10)(-34)
 
 
 def test_less_than():
-    """Tests that hug's less than type successfully limits the values passed in"""
-    assert hug.types.less_than(10)("1") == 1
-    assert hug.types.less_than(10)(1) == 1
-    assert hug.types.less_than(10)(-10) == -10
-    assert "10" in hug.types.less_than(10).__doc__
+    """Tests that hug_core's less than type successfully limits the values passed in"""
+    assert hug_core.types.less_than(10)("1") == 1
+    assert hug_core.types.less_than(10)(1) == 1
+    assert hug_core.types.less_than(10)(-10) == -10
+    assert "10" in hug_core.types.less_than(10).__doc__
     with pytest.raises(ValueError):
-        assert hug.types.less_than(10)(10)
+        assert hug_core.types.less_than(10)(10)
 
 
 def test_greater_than():
-    """Tests that hug's greater than type succefully limis the values passed in"""
-    assert hug.types.greater_than(10)("11") == 11
-    assert hug.types.greater_than(10)(11) == 11
-    assert hug.types.greater_than(10)(1000) == 1000
-    assert "10" in hug.types.greater_than(10).__doc__
+    """Tests that hug_core's greater than type succefully limis the values passed in"""
+    assert hug_core.types.greater_than(10)("11") == 11
+    assert hug_core.types.greater_than(10)(11) == 11
+    assert hug_core.types.greater_than(10)(1000) == 1000
+    assert "10" in hug_core.types.greater_than(10).__doc__
     with pytest.raises(ValueError):
-        assert hug.types.greater_than(10)(9)
+        assert hug_core.types.greater_than(10)(9)
 
 
 def test_multiple():
-    """Tests that hug's multile type correctly forces values to come back as lists, but not lists of lists"""
-    assert hug.types.multiple("value") == ["value"]
-    assert hug.types.multiple(["value1", "value2"]) == ["value1", "value2"]
+    """Tests that hug_core's multile type correctly forces values to come back as lists, but not lists of lists"""
+    assert hug_core.types.multiple("value") == ["value"]
+    assert hug_core.types.multiple(["value1", "value2"]) == ["value1", "value2"]
 
 
 def test_delimited_list():
-    """Test to ensure hug's custom delimited list type function works as expected"""
-    assert hug.types.delimited_list(",")("value1,value2") == ["value1", "value2"]
-    assert hug.types.DelimitedList[int](",")("1,2") == [1, 2]
-    assert hug.types.delimited_list(",")(["value1", "value2"]) == ["value1", "value2"]
-    assert hug.types.delimited_list("|-|")("value1|-|value2|-|value3,value4") == [
+    """Test to ensure hug_core's custom delimited list type function works as expected"""
+    assert hug_core.types.delimited_list(",")("value1,value2") == ["value1", "value2"]
+    assert hug_core.types.DelimitedList[int](",")("1,2") == [1, 2]
+    assert hug_core.types.delimited_list(",")(["value1", "value2"]) == ["value1", "value2"]
+    assert hug_core.types.delimited_list("|-|")("value1|-|value2|-|value3,value4") == [
         "value1",
         "value2",
         "value3,value4",
     ]
-    assert "," in hug.types.delimited_list(",").__doc__
+    assert "," in hug_core.types.delimited_list(",").__doc__
 
 
 def test_comma_separated_list():
-    """Tests that hug's comma separated type correctly converts into a Python list"""
-    assert hug.types.comma_separated_list("value") == ["value"]
-    assert hug.types.comma_separated_list("value1,value2") == ["value1", "value2"]
+    """Tests that hug_core's comma separated type correctly converts into a Python list"""
+    assert hug_core.types.comma_separated_list("value") == ["value"]
+    assert hug_core.types.comma_separated_list("value1,value2") == ["value1", "value2"]
 
 
 def test_float_number():
     """Tests to ensure the float type correctly allows floating point values"""
-    assert hug.types.float_number("1.1") == 1.1
-    assert hug.types.float_number("1") == float(1)
-    assert hug.types.float_number(1.1) == 1.1
+    assert hug_core.types.float_number("1.1") == 1.1
+    assert hug_core.types.float_number("1") == float(1)
+    assert hug_core.types.float_number(1.1) == 1.1
     with pytest.raises(ValueError):
-        hug.types.float_number("bacon")
+        hug_core.types.float_number("bacon")
 
 
 def test_decimal():
     """Tests to ensure the decimal type correctly allows decimal values"""
-    assert hug.types.decimal("1.1") == Decimal("1.1")
-    assert hug.types.decimal("1") == Decimal("1")
-    assert hug.types.decimal(1.1) == Decimal(1.1)
+    assert hug_core.types.decimal("1.1") == Decimal("1.1")
+    assert hug_core.types.decimal("1") == Decimal("1")
+    assert hug_core.types.decimal(1.1) == Decimal(1.1)
     with pytest.raises(ValueError):
-        hug.types.decimal("bacon")
+        hug_core.types.decimal("bacon")
 
 
 def test_boolean():
     """Test to ensure the custom boolean type correctly supports boolean conversion"""
-    assert hug.types.boolean("1")
-    assert hug.types.boolean("T")
-    assert not hug.types.boolean("")
-    assert hug.types.boolean("False")
-    assert not hug.types.boolean(False)
+    assert hug_core.types.boolean("1")
+    assert hug_core.types.boolean("T")
+    assert not hug_core.types.boolean("")
+    assert hug_core.types.boolean("False")
+    assert not hug_core.types.boolean(False)
 
 
 def test_mapping():
     """Test to ensure the mapping type works as expected"""
-    mapping_type = hug.types.mapping({"n": None, "l": [], "s": set()})
+    mapping_type = hug_core.types.mapping({"n": None, "l": [], "s": set()})
     assert mapping_type("n") is None
     assert mapping_type("l") == []
     assert mapping_type("s") == set()
@@ -147,140 +147,140 @@ def test_mapping():
 
 def test_smart_boolean():
     """Test to ensure that the smart boolean type works as expected"""
-    assert hug.types.smart_boolean("true")
-    assert hug.types.smart_boolean("t")
-    assert hug.types.smart_boolean("1")
-    assert hug.types.smart_boolean(1)
-    assert not hug.types.smart_boolean("")
-    assert not hug.types.smart_boolean("false")
-    assert not hug.types.smart_boolean("f")
-    assert not hug.types.smart_boolean("0")
-    assert not hug.types.smart_boolean(0)
-    assert hug.types.smart_boolean(True)
-    assert not hug.types.smart_boolean(None)
-    assert not hug.types.smart_boolean(False)
+    assert hug_core.types.smart_boolean("true")
+    assert hug_core.types.smart_boolean("t")
+    assert hug_core.types.smart_boolean("1")
+    assert hug_core.types.smart_boolean(1)
+    assert not hug_core.types.smart_boolean("")
+    assert not hug_core.types.smart_boolean("false")
+    assert not hug_core.types.smart_boolean("f")
+    assert not hug_core.types.smart_boolean("0")
+    assert not hug_core.types.smart_boolean(0)
+    assert hug_core.types.smart_boolean(True)
+    assert not hug_core.types.smart_boolean(None)
+    assert not hug_core.types.smart_boolean(False)
     with pytest.raises(KeyError):
-        hug.types.smart_boolean("bacon")
+        hug_core.types.smart_boolean("bacon")
 
 
 def test_text():
-    """Tests that hug's text validator correctly handles basic values"""
-    assert hug.types.text("1") == "1"
-    assert hug.types.text(1) == "1"
-    assert hug.types.text("text") == "text"
+    """Tests that hug_core's text validator correctly handles basic values"""
+    assert hug_core.types.text("1") == "1"
+    assert hug_core.types.text(1) == "1"
+    assert hug_core.types.text("text") == "text"
     with pytest.raises(ValueError):
-        hug.types.text(["one", "two"])
+        hug_core.types.text(["one", "two"])
 
 
 def test_uuid():
-    """Tests that hug's text validator correctly handles UUID values
+    """Tests that hug_core's text validator correctly handles UUID values
        Examples were taken from https://docs.python.org/3/library/uuid.html"""
 
-    assert hug.types.uuid("{12345678-1234-5678-1234-567812345678}") == UUID(
+    assert hug_core.types.uuid("{12345678-1234-5678-1234-567812345678}") == UUID(
         "12345678-1234-5678-1234-567812345678"
     )
-    assert hug.types.uuid("12345678-1234-5678-1234-567812345678") == UUID(
+    assert hug_core.types.uuid("12345678-1234-5678-1234-567812345678") == UUID(
         "12345678123456781234567812345678"
     )
-    assert hug.types.uuid("12345678123456781234567812345678") == UUID(
+    assert hug_core.types.uuid("12345678123456781234567812345678") == UUID(
         "12345678-1234-5678-1234-567812345678"
     )
-    assert hug.types.uuid("urn:uuid:12345678-1234-5678-1234-567812345678") == UUID(
+    assert hug_core.types.uuid("urn:uuid:12345678-1234-5678-1234-567812345678") == UUID(
         "12345678-1234-5678-1234-567812345678"
     )
 
     with pytest.raises(ValueError):
-        hug.types.uuid(1)
+        hug_core.types.uuid(1)
 
     with pytest.raises(ValueError):
         # Invalid HEX character
-        hug.types.uuid("12345678-1234-5678-1234-56781234567G")
+        hug_core.types.uuid("12345678-1234-5678-1234-56781234567G")
 
     with pytest.raises(ValueError):
         # One character added
-        hug.types.uuid("12345678-1234-5678-1234-5678123456781")
+        hug_core.types.uuid("12345678-1234-5678-1234-5678123456781")
     with pytest.raises(ValueError):
         # One character removed
-        hug.types.uuid("12345678-1234-5678-1234-56781234567")
+        hug_core.types.uuid("12345678-1234-5678-1234-56781234567")
 
 
 def test_length():
-    """Tests that hug's length type successfully handles a length range"""
-    assert hug.types.length(1, 10)("bacon") == "bacon"
-    assert hug.types.length(1, 10)(42) == "42"
-    assert "42" in hug.types.length(1, 42).__doc__
+    """Tests that hug_core's length type successfully handles a length range"""
+    assert hug_core.types.length(1, 10)("bacon") == "bacon"
+    assert hug_core.types.length(1, 10)(42) == "42"
+    assert "42" in hug_core.types.length(1, 42).__doc__
     with pytest.raises(ValueError):
-        hug.types.length(1, 10)("bacon is the greatest food known to man")
+        hug_core.types.length(1, 10)("bacon is the greatest food known to man")
     with pytest.raises(ValueError):
-        hug.types.length(1, 10)("")
+        hug_core.types.length(1, 10)("")
     with pytest.raises(ValueError):
-        hug.types.length(1, 10)("bacon is th")
+        hug_core.types.length(1, 10)("bacon is th")
 
 
 def test_shorter_than():
-    """Tests that hug's shorter than type successfully limits the values passed in"""
-    assert hug.types.shorter_than(10)("hi there") == "hi there"
-    assert hug.types.shorter_than(10)(1) == "1"
-    assert hug.types.shorter_than(10)("") == ""
-    assert "10" in hug.types.shorter_than(10).__doc__
+    """Tests that hug_core's shorter than type successfully limits the values passed in"""
+    assert hug_core.types.shorter_than(10)("hi there") == "hi there"
+    assert hug_core.types.shorter_than(10)(1) == "1"
+    assert hug_core.types.shorter_than(10)("") == ""
+    assert "10" in hug_core.types.shorter_than(10).__doc__
     with pytest.raises(ValueError):
-        assert hug.types.shorter_than(10)(
+        assert hug_core.types.shorter_than(10)(
             "there is quite a bit of text here, in fact way more than allowed"
         )
 
 
 def test_longer_than():
-    """Tests that hug's greater than type succefully limis the values passed in"""
+    """Tests that hug_core's greater than type succefully limis the values passed in"""
     assert (
-        hug.types.longer_than(10)("quite a bit of text here should be")
+        hug_core.types.longer_than(10)("quite a bit of text here should be")
         == "quite a bit of text here should be"
     )
-    assert hug.types.longer_than(10)(12345678910) == "12345678910"
-    assert hug.types.longer_than(10)(100123456789100) == "100123456789100"
-    assert "10" in hug.types.longer_than(10).__doc__
+    assert hug_core.types.longer_than(10)(12345678910) == "12345678910"
+    assert hug_core.types.longer_than(10)(100123456789100) == "100123456789100"
+    assert "10" in hug_core.types.longer_than(10).__doc__
     with pytest.raises(ValueError):
-        assert hug.types.longer_than(10)("short")
+        assert hug_core.types.longer_than(10)("short")
 
 
 def test_cut_off():
-    """Test to ensure that hug's cut_off type works as expected"""
-    assert hug.types.cut_off(10)("text") == "text"
-    assert hug.types.cut_off(10)(10) == "10"
-    assert hug.types.cut_off(10)("some really long text") == "some reall"
-    assert "10" in hug.types.cut_off(10).__doc__
+    """Test to ensure that hug_core's cut_off type works as expected"""
+    assert hug_core.types.cut_off(10)("text") == "text"
+    assert hug_core.types.cut_off(10)(10) == "10"
+    assert hug_core.types.cut_off(10)("some really long text") == "some reall"
+    assert "10" in hug_core.types.cut_off(10).__doc__
 
 
 def test_inline_dictionary():
     """Tests that inline dictionary values are correctly handled"""
-    int_dict = hug.types.InlineDictionary[int, int]()
+    int_dict = hug_core.types.InlineDictionary[int, int]()
     assert int_dict("1:2") == {1: 2}
     assert int_dict("1:2|3:4") == {1: 2, 3: 4}
-    assert hug.types.inline_dictionary("1:2") == {"1": "2"}
-    assert hug.types.inline_dictionary("1:2|3:4") == {"1": "2", "3": "4"}
+    assert hug_core.types.inline_dictionary("1:2") == {"1": "2"}
+    assert hug_core.types.inline_dictionary("1:2|3:4") == {"1": "2", "3": "4"}
     with pytest.raises(ValueError):
-        hug.types.inline_dictionary("1")
+        hug_core.types.inline_dictionary("1")
 
-    int_dict = hug.types.InlineDictionary[int]()
+    int_dict = hug_core.types.InlineDictionary[int]()
     assert int_dict("1:2") == {1: "2"}
 
-    int_dict = hug.types.InlineDictionary[int, int, int]()
+    int_dict = hug_core.types.InlineDictionary[int, int, int]()
     assert int_dict("1:2") == {1: 2}
 
 
 def test_one_of():
-    """Tests that hug allows limiting a value to one of a list of values"""
-    assert hug.types.one_of(("bacon", "sausage", "pancakes"))("bacon") == "bacon"
-    assert hug.types.one_of(["bacon", "sausage", "pancakes"])("sausage") == "sausage"
-    assert hug.types.one_of({"bacon", "sausage", "pancakes"})("pancakes") == "pancakes"
-    assert "bacon" in hug.types.one_of({"bacon", "sausage", "pancakes"}).__doc__
+    """Tests that hug_core allows limiting a value to one of a list of values"""
+    assert hug_core.types.one_of(("bacon", "sausage", "pancakes"))("bacon") == "bacon"
+    assert hug_core.types.one_of(["bacon", "sausage", "pancakes"])("sausage") == "sausage"
+    assert hug_core.types.one_of({"bacon", "sausage", "pancakes"})("pancakes") == "pancakes"
+    assert "bacon" in hug_core.types.one_of({"bacon", "sausage", "pancakes"}).__doc__
     with pytest.raises(KeyError):
-        hug.types.one_of({"bacon", "sausage", "pancakes"})("syrup")
+        hug_core.types.one_of({"bacon", "sausage", "pancakes"})("syrup")
 
 
 def test_accept():
     """Tests to ensure the accept type wrapper works as expected"""
     custom_converter = lambda value: value + " converted"
-    custom_type = hug.types.accept(custom_converter, "A string Value")
+    custom_type = hug_core.types.accept(custom_converter, "A string Value")
     with pytest.raises(TypeError):
         custom_type(1)
 
@@ -288,7 +288,7 @@ def test_accept():
 def test_accept_custom_exception_text():
     """Tests to ensure it's easy to custom the exception text using the accept wrapper"""
     custom_converter = lambda value: value + " converted"
-    custom_type = hug.types.accept(custom_converter, "A string Value", "Error occurred")
+    custom_type = hug_core.types.accept(custom_converter, "A string Value", "Error occurred")
     assert custom_type("bacon") == "bacon converted"
     with pytest.raises(ValueError):
         custom_type(1)
@@ -297,7 +297,7 @@ def test_accept_custom_exception_text():
 def test_accept_custom_exception_handlers():
     """Tests to ensure it's easy to custom the exception text using the accept wrapper"""
     custom_converter = lambda value: (str(int(value)) if value else value) + " converted"
-    custom_type = hug.types.accept(
+    custom_type = hug_core.types.accept(
         custom_converter, "A string Value", exception_handlers={TypeError: "0 provided"}
     )
     assert custom_type("1") == "1 converted"
@@ -306,7 +306,7 @@ def test_accept_custom_exception_handlers():
     with pytest.raises(ValueError):
         custom_type(0)
 
-    custom_type = hug.types.accept(
+    custom_type = hug_core.types.accept(
         custom_converter, "A string Value", exception_handlers={TypeError: KeyError}
     )
     with pytest.raises(KeyError):
@@ -315,19 +315,19 @@ def test_accept_custom_exception_handlers():
 
 def test_json():
     """Test to ensure that the json type correctly handles url encoded json, as well as direct json"""
-    assert hug.types.json({"this": "works"}) == {"this": "works"}
-    assert hug.types.json(json.dumps({"this": "works"})) == {"this": "works"}
+    assert hug_core.types.json({"this": "works"}) == {"this": "works"}
+    assert hug_core.types.json(json.dumps({"this": "works"})) == {"this": "works"}
     with pytest.raises(ValueError):
-        hug.types.json("Invalid JSON")
+        hug_core.types.json("Invalid JSON")
 
-    assert hug.types.json(json.dumps(["a", "b"]).split(",")) == ["a", "b"]
+    assert hug_core.types.json(json.dumps(["a", "b"]).split(",")) == ["a", "b"]
     with pytest.raises(ValueError):
-        assert hug.types.json(["Invalid JSON", "Invalid JSON"])
+        assert hug_core.types.json(["Invalid JSON", "Invalid JSON"])
 
 
 def test_multi():
     """Test to ensure that the multi type correctly handles a variety of value types"""
-    multi_type = hug.types.multi(hug.types.json, hug.types.smart_boolean)
+    multi_type = hug_core.types.multi(hug_core.types.json, hug_core.types.smart_boolean)
     assert multi_type({"this": "works"}) == {"this": "works"}
     assert multi_type(json.dumps({"this": "works"})) == {"this": "works"}
     assert multi_type("t")
@@ -337,7 +337,7 @@ def test_multi():
 
 def test_chain():
     """Test to ensure that chaining together multiple types works as expected"""
-    chain_type = hug.types.Chain(hug.types.text, hug.types.LongerThan(10))
+    chain_type = hug_core.types.Chain(hug_core.types.text, hug_core.types.LongerThan(10))
     assert chain_type(12345678901) == "12345678901"
     with pytest.raises(ValueError):
         chain_type(1)
@@ -345,7 +345,7 @@ def test_chain():
 
 def test_nullable():
     """Test the concept of a nullable type"""
-    nullable_type = hug.types.Nullable(hug.types.text, hug.types.LongerThan(10))
+    nullable_type = hug_core.types.Nullable(hug_core.types.text, hug_core.types.LongerThan(10))
     assert nullable_type(12345678901) == "12345678901"
     assert nullable_type(None) is None
     with pytest.raises(ValueError):
@@ -353,11 +353,11 @@ def test_nullable():
 
 
 def test_schema_type():
-    """Test hug's complex schema types"""
+    """Test hug_core's complex schema types"""
 
-    class User(hug.types.Schema):
-        username = hug.types.text
-        password = hug.types.Chain(hug.types.text, hug.types.LongerThan(10))
+    class User(hug_core.types.Schema):
+        username = hug_core.types.text
+        password = hug_core.types.Chain(hug_core.types.text, hug_core.types.LongerThan(10))
 
     user_one = User({"username": "brandon", "password": "password123"})
     user_two = User(user_one)
@@ -381,19 +381,19 @@ def test_schema_type():
 
 
 def test_marshmallow_schema():
-    """Test hug's marshmallow schema support"""
+    """Test hug_core's marshmallow schema support"""
 
     class UserSchema(Schema):
         name = fields.Int()
 
-    schema_type = hug.types.MarshmallowInputSchema(UserSchema())
+    schema_type = hug_core.types.MarshmallowInputSchema(UserSchema())
     assert schema_type({"name": 23}, {}) == {"name": 23}
     assert schema_type("""{"name": 23}""", {}) == {"name": 23}
     assert schema_type.__doc__ == "UserSchema"
     with pytest.raises(InvalidTypeData):
         schema_type({"name": "test"}, {})
 
-    schema_type = hug.types.MarshmallowReturnSchema(UserSchema())
+    schema_type = hug_core.types.MarshmallowReturnSchema(UserSchema())
     assert schema_type({"name": 23}) == {"name": 23}
     assert schema_type.__doc__ == "UserSchema"
     with pytest.raises(InvalidTypeData):
@@ -401,10 +401,10 @@ def test_marshmallow_schema():
 
 
 def test_create_type():
-    """Test hug's new type creation decorator works as expected"""
+    """Test hug_core's new type creation decorator works as expected"""
 
-    @hug.type(
-        extend=hug.types.text,
+    @hug_core.type(
+        extend=hug_core.types.text,
         exception_handlers={TypeError: ValueError, LookupError: "Hi!"},
         error_text="Invalid",
     )
@@ -425,7 +425,7 @@ def test_create_type():
     with pytest.raises(ValueError):
         prefixed_string("bye")
 
-    @hug.type(extend=hug.types.text, exception_handlers={TypeError: ValueError})
+    @hug_core.type(extend=hug_core.types.text, exception_handlers={TypeError: ValueError})
     def prefixed_string(value):
         if value == "1+1":
             raise ArithmeticError("Testing different error types")
@@ -434,13 +434,13 @@ def test_create_type():
     with pytest.raises(ArithmeticError):
         prefixed_string("1+1")
 
-    @hug.type(extend=hug.types.text)
+    @hug_core.type(extend=hug_core.types.text)
     def prefixed_string(value):
         return "hi-" + value
 
     assert prefixed_string("there") == "hi-there"
 
-    @hug.type(extend=hug.types.one_of)
+    @hug_core.type(extend=hug_core.types.one_of)
     def numbered(value):
         return int(value)
 
@@ -450,12 +450,12 @@ def test_create_type():
 def test_marshmallow_custom_context():
     custom_context = dict(context="global", factory=0, delete=0, marshmallow=0)
 
-    @hug.context_factory(apply_globally=True)
+    @hug_core.context_factory(apply_globally=True)
     def create_context(*args, **kwargs):
         custom_context["factory"] += 1
         return custom_context
 
-    @hug.delete_context(apply_globally=True)
+    @hug_core.delete_context(apply_globally=True)
     def delete_context(context, *args, **kwargs):
         assert context == custom_context
         custom_context["delete"] += 1
@@ -468,11 +468,11 @@ def test_marshmallow_custom_context():
             assert self.context == custom_context
             self.context["marshmallow"] += 1
 
-    @hug.get()
+    @hug_core.get()
     def made_up_hello(test: MarshmallowContextSchema()):
         return "hi"
 
-    assert hug.test.get(api, "/made_up_hello", {"test": {"name": "test"}}).data == "hi"
+    assert hug_core.test.get(api, "/made_up_hello", {"test": {"name": "test"}}).data == "hi"
     assert custom_context["factory"] == 1
     assert custom_context["delete"] == 1
     assert custom_context["marshmallow"] == 1
@@ -481,21 +481,21 @@ def test_marshmallow_custom_context():
 def test_extending_types_with_context_with_no_error_messages():
     custom_context = dict(context="global", the_only_right_number=42)
 
-    @hug.context_factory()
+    @hug_core.context_factory()
     def create_context(*args, **kwargs):
         return custom_context
 
-    @hug.delete_context()
+    @hug_core.delete_context()
     def delete_context(*args, **kwargs):
         pass
 
-    @hug.type(chain=True, extend=hug.types.number)
+    @hug_core.type(chain=True, extend=hug_core.types.number)
     def check_if_positive(value):
         if value < 0:
             raise ValueError("Not positive")
         return value
 
-    @hug.type(chain=True, extend=check_if_positive, accept_context=True)
+    @hug_core.type(chain=True, extend=check_if_positive, accept_context=True)
     def check_if_near_the_right_number(value, context):
         the_only_right_number = context["the_only_right_number"]
         if value not in [
@@ -506,25 +506,25 @@ def test_extending_types_with_context_with_no_error_messages():
             raise ValueError("Not near the right number")
         return value
 
-    @hug.type(chain=True, extend=check_if_near_the_right_number, accept_context=True)
+    @hug_core.type(chain=True, extend=check_if_near_the_right_number, accept_context=True)
     def check_if_the_only_right_number(value, context):
         if value != context["the_only_right_number"]:
             raise ValueError("Not the right number")
         return value
 
-    @hug.type(chain=False, extend=hug.types.number, accept_context=True)
+    @hug_core.type(chain=False, extend=hug_core.types.number, accept_context=True)
     def check_if_string_has_right_value(value, context):
         if str(context["the_only_right_number"]) not in value:
             raise ValueError("The value does not contain the only right number")
         return value
 
-    @hug.type(chain=False, extend=hug.types.number)
+    @hug_core.type(chain=False, extend=hug_core.types.number)
     def simple_check(value):
         if value != "simple":
             raise ValueError("This is not simple")
         return value
 
-    @hug.get("/check_the_types")
+    @hug_core.get("/check_the_types")
     def check_the_types(
         first: check_if_positive,
         second: check_if_near_the_right_number,
@@ -554,7 +554,7 @@ def test_extending_types_with_context_with_no_error_messages():
     ]
 
     for provided_values, expected_results in test_cases:
-        response = hug.test.get(
+        response = hug_core.test.get(
             api,
             "/check_the_types",
             **{
@@ -581,21 +581,21 @@ def test_extending_types_with_context_with_no_error_messages():
 def test_extending_types_with_context_with_error_messages():
     custom_context = dict(context="global", the_only_right_number=42)
 
-    @hug.context_factory()
+    @hug_core.context_factory()
     def create_context(*args, **kwargs):
         return custom_context
 
-    @hug.delete_context()
+    @hug_core.delete_context()
     def delete_context(*args, **kwargs):
         pass
 
-    @hug.type(chain=True, extend=hug.types.number, error_text="error 1")
+    @hug_core.type(chain=True, extend=hug_core.types.number, error_text="error 1")
     def check_if_positive(value):
         if value < 0:
             raise ValueError("Not positive")
         return value
 
-    @hug.type(chain=True, extend=check_if_positive, accept_context=True, error_text="error 2")
+    @hug_core.type(chain=True, extend=check_if_positive, accept_context=True, error_text="error 2")
     def check_if_near_the_right_number(value, context):
         the_only_right_number = context["the_only_right_number"]
         if value not in [
@@ -606,7 +606,7 @@ def test_extending_types_with_context_with_error_messages():
             raise ValueError("Not near the right number")
         return value
 
-    @hug.type(
+    @hug_core.type(
         chain=True, extend=check_if_near_the_right_number, accept_context=True, error_text="error 3"
     )
     def check_if_the_only_right_number(value, context):
@@ -614,19 +614,19 @@ def test_extending_types_with_context_with_error_messages():
             raise ValueError("Not the right number")
         return value
 
-    @hug.type(chain=False, extend=hug.types.number, accept_context=True, error_text="error 4")
+    @hug_core.type(chain=False, extend=hug_core.types.number, accept_context=True, error_text="error 4")
     def check_if_string_has_right_value(value, context):
         if str(context["the_only_right_number"]) not in value:
             raise ValueError("The value does not contain the only right number")
         return value
 
-    @hug.type(chain=False, extend=hug.types.number, error_text="error 5")
+    @hug_core.type(chain=False, extend=hug_core.types.number, error_text="error 5")
     def simple_check(value):
         if value != "simple":
             raise ValueError("This is not simple")
         return value
 
-    @hug.get("/check_the_types")
+    @hug_core.get("/check_the_types")
     def check_the_types(
         first: check_if_positive,
         second: check_if_near_the_right_number,
@@ -647,7 +647,7 @@ def test_extending_types_with_context_with_error_messages():
     ]
 
     for provided_values, expected_results in test_cases:
-        response = hug.test.get(
+        response = hug_core.test.get(
             api,
             "/check_the_types",
             **{
@@ -689,15 +689,15 @@ def test_extending_types_with_exception_in_function():
         CustomStrException: "string exception",
     }
 
-    @hug.context_factory()
+    @hug_core.context_factory()
     def create_context(*args, **kwargs):
         return custom_context
 
-    @hug.delete_context()
+    @hug_core.delete_context()
     def delete_context(*args, **kwargs):
         pass
 
-    @hug.type(chain=True, extend=hug.types.number, exception_handlers=exception_handlers)
+    @hug_core.type(chain=True, extend=hug_core.types.number, exception_handlers=exception_handlers)
     def check_simple_exception(value):
         if value < 0:
             raise CustomStrException()
@@ -706,9 +706,9 @@ def test_extending_types_with_exception_in_function():
         else:
             raise CustomFunctionException()
 
-    @hug.type(
+    @hug_core.type(
         chain=True,
-        extend=hug.types.number,
+        extend=hug_core.types.number,
         exception_handlers=exception_handlers,
         accept_context=True,
     )
@@ -720,11 +720,11 @@ def test_extending_types_with_exception_in_function():
         else:
             raise CustomFunctionException()
 
-    @hug.type(chain=True, extend=hug.types.number, accept_context=True)
+    @hug_core.type(chain=True, extend=hug_core.types.number, accept_context=True)
     def no_check(value, context):
         return value
 
-    @hug.type(
+    @hug_core.type(
         chain=True, extend=no_check, exception_handlers=exception_handlers, accept_context=True
     )
     def check_another_context_exception(value, context):
@@ -735,7 +735,7 @@ def test_extending_types_with_exception_in_function():
         else:
             raise CustomFunctionException()
 
-    @hug.type(chain=False, exception_handlers=exception_handlers, accept_context=True)
+    @hug_core.type(chain=False, exception_handlers=exception_handlers, accept_context=True)
     def check_simple_no_chain_exception(value, context):
         if value == "-1":
             raise CustomStrException()
@@ -744,7 +744,7 @@ def test_extending_types_with_exception_in_function():
         else:
             raise CustomFunctionException()
 
-    @hug.type(chain=False, exception_handlers=exception_handlers, accept_context=False)
+    @hug_core.type(chain=False, exception_handlers=exception_handlers, accept_context=False)
     def check_simple_no_chain_no_context_exception(value):
         if value == "-1":
             raise CustomStrException()
@@ -753,7 +753,7 @@ def test_extending_types_with_exception_in_function():
         else:
             raise CustomFunctionException()
 
-    @hug.get("/raise_exception")
+    @hug_core.get("/raise_exception")
     def raise_exception(
         first: check_simple_exception,
         second: check_context_exception,
@@ -763,7 +763,7 @@ def test_extending_types_with_exception_in_function():
     ):
         return {}
 
-    response = hug.test.get(
+    response = hug_core.test.get(
         api, "/raise_exception", **{"first": 1, "second": 1, "third": 1, "forth": 1, "fifth": 1}
     )
     assert response.data["errors"] == {
@@ -773,7 +773,7 @@ def test_extending_types_with_exception_in_function():
         "second": "function exception",
         "first": "function exception",
     }
-    response = hug.test.get(
+    response = hug_core.test.get(
         api,
         "/raise_exception",
         **{"first": -1, "second": -1, "third": -1, "forth": -1, "fifth": -1}
@@ -785,7 +785,7 @@ def test_extending_types_with_exception_in_function():
         "second": "string exception",
         "first": "string exception",
     }
-    response = hug.test.get(
+    response = hug_core.test.get(
         api, "/raise_exception", **{"first": 0, "second": 0, "third": 0, "forth": 0, "fifth": 0}
     )
     assert response.data["errors"] == {
@@ -801,28 +801,28 @@ def test_validate_route_args_positive_case():
     class TestSchema(Schema):
         bar = fields.String()
 
-    @hug.get("/hello", args={"foo": fields.Integer(), "return": TestSchema()})
+    @hug_core.get("/hello", args={"foo": fields.Integer(), "return": TestSchema()})
     def hello(foo: int) -> dict:
         return {"bar": str(foo)}
 
-    response = hug.test.get(api, "/hello", **{"foo": 5})
+    response = hug_core.test.get(api, "/hello", **{"foo": 5})
     assert response.data == {"bar": "5"}
 
 
 def test_validate_route_args_negative_case():
-    @hug.get("/hello", raise_on_invalid=True, args={"foo": fields.Integer()})
+    @hug_core.get("/hello", raise_on_invalid=True, args={"foo": fields.Integer()})
     def hello(foo: int):
         return str(foo)
 
     with pytest.raises(ValidationError):
-        hug.test.get(api, "/hello", **{"foo": "a"})
+        hug_core.test.get(api, "/hello", **{"foo": "a"})
 
     class TestSchema(Schema):
         bar = fields.Integer()
 
-    @hug.get("/foo", raise_on_invalid=True, args={"return": TestSchema()})
+    @hug_core.get("/foo", raise_on_invalid=True, args={"return": TestSchema()})
     def foo():
         return {"bar": "a"}
 
     with pytest.raises(InvalidTypeData):
-        hug.test.get(api, "/foo")
+        hug_core.test.get(api, "/foo")

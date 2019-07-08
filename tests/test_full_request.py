@@ -1,6 +1,6 @@
 """tests/test_full_request.py.
 
-Test cases that rely on a command being ran against a running hug server
+Test cases that rely on a command being ran against a running hug_core server
 
 Copyright (C) 2016 Timothy Edmund Crosley
 
@@ -27,13 +27,13 @@ from subprocess import Popen
 import pytest
 import requests
 
-import hug
+import hug_core
 
 TEST_HUG_API = """
-import hug
+import hug_core
 
 
-@hug.post("/test", output=hug.output_format.json)
+@hug_core.post("/test", output=hug_core.output_format.json)
 def post(body, response):
     print(body)
     return {'message': 'ok'}
@@ -41,13 +41,13 @@ def post(body, response):
 
 
 @pytest.mark.skipif(
-    platform.python_implementation() == "PyPy", reason="Can't run hug CLI from travis PyPy"
+    platform.python_implementation() == "PyPy", reason="Can't run hug_core CLI from travis PyPy"
 )
 @pytest.mark.skipif(sys.platform == "win32", reason="CLI not currently testable on Windows")
-def test_hug_post(tmp_path):
-    hug_test_file = tmp_path / "hug_postable.py"
-    hug_test_file.write_text(TEST_HUG_API)
-    hug_server = Popen(["hug", "-f", str(hug_test_file), "-p", "3000"])
+def test_hug_core_post(tmp_path):
+    hug_core_test_file = tmp_path / "hug_core_postable.py"
+    hug_core_test_file.write_text(TEST_HUG_API)
+    hug_core_server = Popen(["hug_core", "-f", str(hug_core_test_file), "-p", "3000"])
     time.sleep(5)
     requests.post("http://127.0.0.1:3000/test", {"data": "here"})
-    hug_server.kill()
+    hug_core_server.kill()

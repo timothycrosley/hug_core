@@ -21,21 +21,21 @@ OTHER DEALINGS IN THE SOFTWARE.
 """
 import pytest
 
-import hug
+import hug_core
 
-api = hug.API(__name__)
+api = hug_core.API(__name__)
 
 
 def test_cli():
     """Test to ensure the CLI tester works as intended to allow testing CLI endpoints"""
 
-    @hug.cli()
+    @hug_core.cli()
     def my_cli_function():
         return "Hello"
 
-    assert hug.test.cli(my_cli_function) == "Hello"
-    assert hug.test.cli("my_cli_function", api=api) == "Hello"
+    assert hug_core.test.cli(my_cli_function) == "Hello"
+    assert hug_core.test.cli("my_cli_function", api=api) == "Hello"
 
     # Shouldn't be able to specify both api and module.
     with pytest.raises(ValueError):
-        assert hug.test.cli("my_method", api=api, module=hug)
+        assert hug_core.test.cli("my_method", api=api, module=hug_core)

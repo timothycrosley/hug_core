@@ -1,6 +1,6 @@
 """tests/test_validate.py.
 
-Tests to ensure hug's custom validation methods work as expected
+Tests to ensure hug_core's custom validation methods work as expected
 
 Copyright (C) 2016 Timothy Edmund Crosley
 
@@ -19,32 +19,32 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 OTHER DEALINGS IN THE SOFTWARE.
 
 """
-import hug
+import hug_core
 
 TEST_SCHEMA = {"first": "Timothy", "place": "Seattle"}
 
 
 def test_all():
-    """Test to ensure hug's all validation function works as expected to combine validators"""
-    assert not hug.validate.all(
-        hug.validate.contains_one_of("first", "year"), hug.validate.contains_one_of("last", "place")
+    """Test to ensure hug_core's all validation function works as expected to combine validators"""
+    assert not hug_core.validate.all(
+        hug_core.validate.contains_one_of("first", "year"), hug_core.validate.contains_one_of("last", "place")
     )(TEST_SCHEMA)
-    assert hug.validate.all(
-        hug.validate.contains_one_of("last", "year"), hug.validate.contains_one_of("first", "place")
+    assert hug_core.validate.all(
+        hug_core.validate.contains_one_of("last", "year"), hug_core.validate.contains_one_of("first", "place")
     )(TEST_SCHEMA)
 
 
 def test_any():
-    """Test to ensure hug's any validation function works as expected to combine validators"""
-    assert not hug.validate.any(
-        hug.validate.contains_one_of("last", "year"), hug.validate.contains_one_of("first", "place")
+    """Test to ensure hug_core's any validation function works as expected to combine validators"""
+    assert not hug_core.validate.any(
+        hug_core.validate.contains_one_of("last", "year"), hug_core.validate.contains_one_of("first", "place")
     )(TEST_SCHEMA)
-    assert hug.validate.any(
-        hug.validate.contains_one_of("last", "year"), hug.validate.contains_one_of("no", "way")
+    assert hug_core.validate.any(
+        hug_core.validate.contains_one_of("last", "year"), hug_core.validate.contains_one_of("no", "way")
     )(TEST_SCHEMA)
 
 
 def test_contains_one_of():
-    """Test to ensure hug's contains_one_of validation function works as expected to ensure presence of a field"""
-    assert hug.validate.contains_one_of("no", "way")(TEST_SCHEMA)
-    assert not hug.validate.contains_one_of("last", "place")(TEST_SCHEMA)
+    """Test to ensure hug_core's contains_one_of validation function works as expected to ensure presence of a field"""
+    assert hug_core.validate.contains_one_of("no", "way")(TEST_SCHEMA)
+    assert not hug_core.validate.contains_one_of("last", "place")(TEST_SCHEMA)

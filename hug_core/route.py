@@ -1,4 +1,4 @@
-"""hug/route.py
+"""hug_core/route.py
 
 Defines user usable routers
 
@@ -26,14 +26,14 @@ from types import FunctionType, MethodType
 
 from falcon import HTTP_METHODS
 
-import hug.api
-from hug.routing import CLIRouter as cli  # noqa:  N813
-from hug.routing import ExceptionRouter as exception  # noqa:  N813
-from hug.routing import LocalRouter as local  # noqa:  N813
-from hug.routing import NotFoundRouter as not_found  # noqa:  N813
-from hug.routing import SinkRouter as sink  # noqa:  N813
-from hug.routing import StaticRouter as static  # noqa:  N813
-from hug.routing import URLRouter as http  # noqa:  N813
+import hug_core.api
+from hug_core.routing import CLIRouter as cli  # noqa:  N813
+from hug_core.routing import ExceptionRouter as exception  # noqa:  N813
+from hug_core.routing import LocalRouter as local  # noqa:  N813
+from hug_core.routing import NotFoundRouter as not_found  # noqa:  N813
+from hug_core.routing import SinkRouter as sink  # noqa:  N813
+from hug_core.routing import StaticRouter as static  # noqa:  N813
+from hug_core.routing import URLRouter as http  # noqa:  N813
 
 
 class Object(http):
@@ -47,9 +47,9 @@ class Object(http):
             return self.where(**kwargs)
 
         if isinstance(method_or_class, (MethodType, FunctionType)):
-            routes = getattr(method_or_class, "_hug_http_routes", [])
+            routes = getattr(method_or_class, "_hug_core_http_routes", [])
             routes.append(self.route)
-            method_or_class._hug_http_routes = routes
+            method_or_class._hug_core_http_routes = routes
             return method_or_class
 
         instance = method_or_class
@@ -59,11 +59,11 @@ class Object(http):
         for argument in dir(instance):
             argument = getattr(instance, argument, None)
 
-            http_routes = getattr(argument, "_hug_http_routes", ())
+            http_routes = getattr(argument, "_hug_core_http_routes", ())
             for route in http_routes:
                 http(**self.where(**route).route)(argument)
 
-            cli_routes = getattr(argument, "_hug_cli_routes", ())
+            cli_routes = getattr(argument, "_hug_core_cli_routes", ())
             for route in cli_routes:
                 cli(**self.where(**route).route)(argument)
 

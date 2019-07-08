@@ -1,4 +1,4 @@
-"""hug/api.py
+"""hug_core/api.py
 
 Defines the dynamically generated Hug API object that is responsible for storing all routes and state within a module
 
@@ -30,10 +30,10 @@ from itertools import chain
 from types import ModuleType
 from wsgiref.simple_server import make_server
 
-import hug.defaults
-import hug.output_format
-from hug import introspect
-from hug._version import current
+import hug_core.defaults
+import hug_core.output_format
+from hug_core import introspect
+from hug_core._version import current
 
 INTRO = """
 /#######################################################################\\

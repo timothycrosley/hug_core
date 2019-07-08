@@ -1,6 +1,6 @@
-"""hug/validate.py
+"""hug_core/validate.py
 
-Defines hugs built-in validation methods
+Defines hug_cores built-in validation methods
 
 Copyright (C) 2016  Timothy Edmund Crosley
 

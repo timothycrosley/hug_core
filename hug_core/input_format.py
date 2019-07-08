@@ -1,4 +1,4 @@
-"""hug/input_formats.py
+"""hug_core/input_formats.py
 
 Defines the built-in Hug input_formatting handlers
 
@@ -25,8 +25,8 @@ import re
 from cgi import parse_multipart
 from urllib.parse import parse_qs as urlencoded_converter
 
-from hug.format import content_type, underscore
-from hug.json_module import json as json_converter
+from hug_core.format import content_type, underscore
+from hug_core.json_module import json as json_converter
 
 
 @content_type("text/plain")

@@ -1,4 +1,4 @@
-"""hug/this.py.
+"""hug_core/this.py.
 
 The Zen of Hug
 

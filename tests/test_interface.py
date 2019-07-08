@@ -1,6 +1,6 @@
 """tests/test_interface.py.
 
-Tests hug's defined interfaces (HTTP, CLI, & Local)
+Tests hug_core's defined interfaces (HTTP, CLI, & Local)
 
 Copyright (C) 2016 Timothy Edmund Crosley
 
@@ -21,16 +21,16 @@ OTHER DEALINGS IN THE SOFTWARE.
 """
 import pytest
 
-import hug
+import hug_core
 
 
-@hug.http(("/namer", "/namer/{name}"), ("GET", "POST"), versions=(None, 2))
+@hug_core.http(("/namer", "/namer/{name}"), ("GET", "POST"), versions=(None, 2))
 def namer(name=None):
     return name
 
 
 class TestHTTP(object):
-    """Tests the functionality provided by hug.interface.HTTP"""
+    """Tests the functionality provided by hug_core.interface.HTTP"""
 
     def test_urls(self):
         """Test to ensure HTTP interface correctly returns URLs associated with it"""
@@ -51,25 +51,25 @@ class TestHTTP(object):
     def test_gather_parameters(self):
         """Test to ensure gathering parameters works in the expected way"""
 
-        @hug.get()
+        @hug_core.get()
         def my_example_api(body):
             return body
 
         assert (
-            hug.test.get(
-                __hug__, "my_example_api", body="", headers={"content-type": "application/json"}
+            hug_core.test.get(
+                __hug_core__, "my_example_api", body="", headers={"content-type": "application/json"}
             ).data
             == None
         )
 
 
 class TestLocal(object):
-    """Test to ensure hug.interface.Local functionality works as expected"""
+    """Test to ensure hug_core.interface.Local functionality works as expected"""
 
     def test_local_method(self):
         class MyObject(object):
-            @hug.local()
-            def my_method(self, argument_1: hug.types.number):
+            @hug_core.local()
+            def my_method(self, argument_1: hug_core.types.number):
                 return argument_1
 
         instance = MyObject()

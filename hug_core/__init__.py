@@ -1,4 +1,4 @@
-"""hug/__init__.py
+"""hug_core/__init__.py
 
 Everyone needs a hug every once in a while. Even API developers. Hug aims to make developing Python driven APIs as
 simple as possible, but no simpler.
@@ -31,9 +31,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 """
 from __future__ import absolute_import
 
-from falcon import *
-
-from hug import (
+from hug_core import (
     directives,
     exceptions,
     format,
@@ -49,9 +47,9 @@ from hug import (
     use,
     validate,
 )
-from hug._version import current
-from hug.api import API
-from hug.decorators import (
+from hug_core._version import current
+from hug_core.api import API
+from hug_core.decorators import (
     context_factory,
     default_input_format,
     default_output_format,
@@ -65,33 +63,12 @@ from hug.decorators import (
     startup,
     wraps,
 )
-from hug.route import (
-    call,
-    cli,
-    connect,
-    delete,
-    exception,
-    get,
-    get_post,
-    head,
-    http,
-    local,
-    not_found,
-    object,
-    options,
-    patch,
-    post,
-    put,
-    sink,
-    static,
-    trace,
-)
-from hug.types import create as type
+from hug_core.route import local
+from hug_core.types import create as type
 
 # The following imports must be imported last; in particular, defaults to have access to all modules
-from hug import authentication  # isort:skip
-from hug import development_runner  # isort:skip
-from hug import defaults  # isort:skip
+from hug_core import development_runner  # isort:skip
+from hug_core import defaults  # isort:skip
 
 try:  # pragma: no cover - defaulting to uvloop if it is installed
     import uvloop

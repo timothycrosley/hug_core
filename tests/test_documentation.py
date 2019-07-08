@@ -26,40 +26,40 @@ import marshmallow
 from falcon import Request
 from falcon.testing import StartResponseMock, create_environ
 
-import hug
+import hug_core
 
-api = hug.API(__name__)
+api = hug_core.API(__name__)
 
 
 def test_basic_documentation():
     """Ensure creating and then documenting APIs with Hug works as intuitively as expected"""
 
-    @hug.get()
+    @hug_core.get()
     def hello_world():
         """Returns hello world"""
         return "Hello World!"
 
-    @hug.post()
+    @hug_core.post()
     def echo(text):
         """Returns back whatever data it is given in the text parameter"""
         return text
 
-    @hug.post("/happy_birthday", examples="name=HUG&age=1")
-    def birthday(name, age: hug.types.number = 1):
+    @hug_core.post("/happy_birthday", examples="name=HUG&age=1")
+    def birthday(name, age: hug_core.types.number = 1):
         """Says happy birthday to a user"""
         return "Happy {age} Birthday {name}!".format(**locals())
 
-    @hug.post()
+    @hug_core.post()
     def noop(request, response):
         """Performs no action"""
         pass
 
-    @hug.get()
-    def string_docs(data: "Takes data", ignore_directive: hug.directives.Timer) -> "Returns data":
+    @hug_core.get()
+    def string_docs(data: "Takes data", ignore_directive: hug_core.directives.Timer) -> "Returns data":
         """Annotations defined with strings should be documentation only"""
         pass
 
-    @hug.get(private=True)
+    @hug_core.get(private=True)
     def private():
         """Hidden from documentation"""
         pass
@@ -97,30 +97,30 @@ def test_basic_documentation():
     assert documentation["handlers"]["/string_docs"]["GET"]["outputs"]["type"] == "Returns data"
     assert "ignore_directive" not in documentation["handlers"]["/string_docs"]["GET"]["inputs"]
 
-    @hug.post(versions=1)  # noqa
+    @hug_core.post(versions=1)  # noqa
     def echo(text):
         """V1 Docs"""
         return "V1"
 
-    @hug.post(versions=2)  # noqa
+    @hug_core.post(versions=2)  # noqa
     def echo(text):
         """V1 Docs"""
         return "V2"
 
-    @hug.post(versions=2)
+    @hug_core.post(versions=2)
     def test(text):
         """V1 Docs"""
         return True
 
-    @hug.get(requires=test)
+    @hug_core.get(requires=test)
     def unversioned():
         return "Hello"
 
-    @hug.get(versions=False)
+    @hug_core.get(versions=False)
     def noversions():
         pass
 
-    @hug.extend_api("/fake", base_url="/api")
+    @hug_core.extend_api("/fake", base_url="/api")
     def extend_with():
         import tests.module_fake_simple
 
@@ -157,12 +157,12 @@ def test_basic_documentation():
 
 def test_basic_documentation_output_type_accept():
     """Ensure API documentation works with selectable output types"""
-    accept_output = hug.output_format.accept(
+    accept_output = hug_core.output_format.accept(
         {
-            "application/json": hug.output_format.json,
-            "application/pretty-json": hug.output_format.pretty_json,
+            "application/json": hug_core.output_format.json,
+            "application/pretty-json": hug_core.output_format.pretty_json,
         },
-        default=hug.output_format.json,
+        default=hug_core.output_format.json,
     )
     with mock.patch.object(api.http, "_output_format", accept_output, create=True):
         handler = api.http.documentation_404()
@@ -178,7 +178,7 @@ def test_marshmallow_return_type_documentation():
     class Returns(marshmallow.Schema):
         "Return docs"
 
-    @hug.post()
+    @hug_core.post()
     def marshtest() -> Returns():
         pass
 
@@ -187,8 +187,8 @@ def test_marshmallow_return_type_documentation():
     assert doc["handlers"]["/marshtest"]["POST"]["outputs"]["type"] == "Return docs"
 
 def test_map_params_documentation_preserves_type():
-    @hug.get(map_params={"from": "from_mapped"})
-    def map_params_test(from_mapped: hug.types.number):
+    @hug_core.get(map_params={"from": "from_mapped"})
+    def map_params_test(from_mapped: hug_core.types.number):
         pass
 
     doc = api.http.documentation()

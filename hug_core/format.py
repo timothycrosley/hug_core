@@ -1,4 +1,4 @@
-"""hug/format.py
+"""hug_core/format.py
 
 Defines formatting utility methods that are common both to input and output formatting and aid in general formatting of
 fields and content
@@ -24,7 +24,7 @@ from __future__ import absolute_import
 
 import re
 
-from hug import _empty as empty
+from hug_core import _empty as empty
 
 UNDERSCORE = (re.compile("(.)([A-Z][a-z]+)"), re.compile("([a-z0-9])([A-Z])"))
 

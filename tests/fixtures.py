@@ -18,9 +18,7 @@ def hug_core_api():
     """Defines a dependency for and then includes a uniquely identified hug_core API for a single test case"""
     api = TestAPI("fake_api_{}".format(randint(0, 1000000)))
     api.route = Routers(
-        hug_core.routing.URLRouter().api(api),
         hug_core.routing.LocalRouter().api(api),
-        hug_core.routing.CLIRouter().api(api),
     )
     return api
 

@@ -37,14 +37,9 @@ from hug_core import (
     format,
     input_format,
     introspect,
-    middleware,
     output_format,
-    redirect,
-    route,
-    test,
     transform,
     types,
-    use,
     validate,
 )
 from hug_core._version import current
@@ -56,18 +51,12 @@ from hug_core.decorators import (
     delete_context,
     directive,
     extend_api,
-    middleware_class,
-    reqresp_middleware,
-    request_middleware,
-    response_middleware,
     startup,
     wraps,
 )
-from hug_core.route import local
 from hug_core.types import create as type
 
 # The following imports must be imported last; in particular, defaults to have access to all modules
-from hug_core import development_runner  # isort:skip
 from hug_core import defaults  # isort:skip
 
 try:  # pragma: no cover - defaulting to uvloop if it is installed

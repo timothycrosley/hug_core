@@ -28,8 +28,6 @@ cli_output_format = hug_core.output_format.text
 
 input_format = {
     "application/json": hug_core.input_format.json,
-    "application/x-www-form-urlencoded": hug_core.input_format.urlencoded,
-    "multipart/form-data": hug_core.input_format.multipart,
     "text/plain": hug_core.input_format.text,
     "text/css": hug_core.input_format.text,
     "text/html": hug_core.input_format.text,
@@ -41,8 +39,6 @@ directives = {
     "module": hug_core.directives.module,
     "current_api": hug_core.directives.CurrentAPI,
     "api_version": hug_core.directives.api_version,
-    "user": hug_core.directives.user,
-    "session": hug_core.directives.session,
     "documentation": hug_core.directives.documentation,
 }
 

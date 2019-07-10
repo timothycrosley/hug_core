@@ -37,7 +37,6 @@ import hug_core.output_format
 import hug_core.types as types
 from hug_core import introspect
 from hug_core.exceptions import InvalidTypeData
-from hug_core.format import parse_content_type
 from hug_core.types import (
     MarshmallowInputSchema,
     MarshmallowReturnSchema,

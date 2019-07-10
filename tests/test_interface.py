@@ -24,45 +24,6 @@ import pytest
 import hug_core
 
 
-@hug_core.http(("/namer", "/namer/{name}"), ("GET", "POST"), versions=(None, 2))
-def namer(name=None):
-    return name
-
-
-class TestHTTP(object):
-    """Tests the functionality provided by hug_core.interface.HTTP"""
-
-    def test_urls(self):
-        """Test to ensure HTTP interface correctly returns URLs associated with it"""
-        assert namer.interface.http.urls() == ["/namer", "/namer/{name}"]
-
-    def test_url(self):
-        """Test to ensure HTTP interface correctly automatically returns URL associated with it"""
-        assert namer.interface.http.url() == "/namer"
-        assert namer.interface.http.url(name="tim") == "/namer/tim"
-        assert namer.interface.http.url(name="tim", version=2) == "/v2/namer/tim"
-
-        with pytest.raises(KeyError):
-            namer.interface.http.url(undefined="not a variable")
-
-        with pytest.raises(KeyError):
-            namer.interface.http.url(version=10)
-
-    def test_gather_parameters(self):
-        """Test to ensure gathering parameters works in the expected way"""
-
-        @hug_core.get()
-        def my_example_api(body):
-            return body
-
-        assert (
-            hug_core.test.get(
-                __hug_core__, "my_example_api", body="", headers={"content-type": "application/json"}
-            ).data
-            == None
-        )
-
-
 class TestLocal(object):
     """Test to ensure hug_core.interface.Local functionality works as expected"""
 

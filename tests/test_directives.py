@@ -28,7 +28,7 @@ import hug_core
 api = hug_core.API(__name__)
 
 # Fix flake8 undefined names (F821)
-__hug_core__ = __hug_core__  # noqa
+__hug__ = __hug__  # noqa
 
 
 def test_timer():
@@ -172,13 +172,13 @@ def test_local_named_directives():
     """Ensure that it's possible to attach directives to local function calling"""
 
     @hug_core.local()
-    def test(time: __hug_core__.directive("timer") = 3):
+    def test(time: __hug__.directive("timer") = 3):
         return time
 
     assert isinstance(test(), hug_core.directives.Timer)
 
     @hug_core.local(directives=False)
-    def test(time: __hug_core__.directive("timer") = 3):
+    def test(time: __hug__.directive("timer") = 3):
         return time
 
     assert isinstance(test(3), int)
@@ -189,7 +189,7 @@ def test_named_directives_by_name():
 
     @hug_core.get()
     @hug_core.local()
-    def test(time: __hug_core__.directive("timer") = 3):
+    def test(time: __hug__.directive("timer") = 3):
         return time
 
     assert isinstance(test(), hug_core.directives.Timer)

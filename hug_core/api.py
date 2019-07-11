@@ -158,18 +158,6 @@ class API(object, metaclass=ModuleSingleton):
             yield from self.cli.handlers()
 
     @property
-    def http(self):
-        if not hasattr(self, "_http"):
-            self._http = HTTPInterfaceAPI(self)
-        return self._http
-
-    @property
-    def cli(self):
-        if not hasattr(self, "_cli"):
-            self._cli = CLIInterfaceAPI(self, error_exit_codes=self.cli_error_exit_codes)
-        return self._cli
-
-    @property
     def context_factory(self):
         return getattr(self, "_context_factory", hug.defaults.context_factory)
 

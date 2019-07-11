@@ -134,7 +134,7 @@ class API(object, metaclass=ModuleSingleton):
     def directives(self):
         """Returns all directives applicable to this Hug API"""
         directive_sources = chain(
-            hug.defaults.directives.items(), getattr(self, "_directives", {}).items()
+            hug_core.defaults.directives.items(), getattr(self, "_directives", {}).items()
         )
         return {
             "hug_" + directive_name: directive for directive_name, directive in directive_sources
@@ -143,7 +143,7 @@ class API(object, metaclass=ModuleSingleton):
     def directive(self, name, default=None):
         """Returns the loaded directive with the specified name, or default if passed name is not present"""
         return getattr(self, "_directives", {}).get(
-            name, hug.defaults.directives.get(name, default)
+            name, hug_core.defaults.directives.get(name, default)
         )
 
     def add_directive(self, directive):
@@ -159,7 +159,7 @@ class API(object, metaclass=ModuleSingleton):
 
     @property
     def context_factory(self):
-        return getattr(self, "_context_factory", hug.defaults.context_factory)
+        return getattr(self, "_context_factory", hug_core.defaults.context_factory)
 
     @context_factory.setter
     def context_factory(self, context_factory_):
@@ -167,7 +167,7 @@ class API(object, metaclass=ModuleSingleton):
 
     @property
     def delete_context(self):
-        return getattr(self, "_delete_context", hug.defaults.delete_context)
+        return getattr(self, "_delete_context", hug_core.defaults.delete_context)
 
     @delete_context.setter
     def delete_context(self, delete_context_):

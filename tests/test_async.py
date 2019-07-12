@@ -35,7 +35,7 @@ def test_basic_call_async():
     async def hello_world():
         return "Hello World!"
 
-    assert loop.run_until_complete(hello_world()) == "Hello World!"
+    assert hello_world() == "Hello World!"
 
 
 def tested_nested_basic_call_async():
@@ -49,7 +49,6 @@ def tested_nested_basic_call_async():
     async def nested_hello_world(self=None):
         return "Hello World!"
 
-    assert loop.run_until_complete(hello_world()) == "Hello World!"
     assert hello_world() == "Hello World!"
 
 

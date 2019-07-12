@@ -78,14 +78,14 @@ def test_documentation():
     assert "handlers" in hug_core.directives.documentation(api=api)
 
 
-def test_api_version():
-    """Ensure that it's possible to get the current version of an API based on a directive"""
+#def test_api_version():
+    #"""Ensure that it's possible to get the current version of an API based on a directive"""
 
-    @hug_core.local(versions=1)
-    def version_tester(hug_api_version):
-        return hug_api_version
+    #@hug_core.local(versions=1)
+    #def version_tester(hug_api_version):
+        #return hug_api_version
 
-    assert version_tester() == 1
+    #assert version_tester() == 1
 
 
 def test_current_api():

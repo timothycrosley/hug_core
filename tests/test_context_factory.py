@@ -340,7 +340,8 @@ class TestContextFactoryCLI(object):
             custom_context["launched_local_function"] = True
             raise CustomException()
 
-        exception_local_function()
+        with pytest.raises(CustomException):
+            exception_local_function()
 
         assert "launched_local_function" in custom_context
         assert "launched_delete_context" in custom_context
@@ -396,7 +397,7 @@ class TestContextFactoryHTTP(object):
         def requirement_local_function():
             custom_context["launched_local_function"] = True
 
-        requirement_function()
+        requirement_local_function()
         assert "launched_local_function" not in custom_context
         assert "launched_requirement" in custom_context
         assert "launched_delete_context" in custom_context

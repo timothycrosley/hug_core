@@ -25,6 +25,7 @@ pip-selfcheck.json
 
 # Unit test / coverage reports
 .coverage
+.coverage*
 .tox
 nosetests.xml
 htmlcov

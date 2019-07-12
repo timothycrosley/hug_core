@@ -6,7 +6,7 @@ import pytest
 
 import hug_core
 
-Routers = namedtuple("Routers", ["http", "local", "cli"])
+Routers = namedtuple("Routers", ["local"])
 
 
 class TestAPI(hug_core.API):

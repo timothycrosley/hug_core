@@ -55,6 +55,7 @@ from hug_core.decorators import (
     wraps,
 )
 from hug_core.types import create as type
+from hug_core.routing import LocalRouter as local
 
 # The following imports must be imported last; in particular, defaults to have access to all modules
 from hug_core import defaults  # isort:skip

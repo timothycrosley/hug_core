@@ -46,7 +46,7 @@ class TestAPI(object):
         import module_created_on_the_fly
 
         assert module_created_on_the_fly
-        assert module_created_on_the_fly.__hug_core__ == new_api
+        assert module_created_on_the_fly.__hug__ == new_api
 
 
 def test_from_object():
@@ -67,65 +67,3 @@ def test_anonymous():
     assert hug_core.API().name == ""
     assert hug_core.API(name="my_name").name == "my_name"
     assert hug_core.API(doc="Custom documentation").doc == "Custom documentation"
-
-
-def test_api_routes(hug_core_api):
-    """Ensure http API can return a quick mapping all urls to method"""
-    hug_core_api.http.base_url = "/root"
-
-    @hug_core.get(api=hug_core_api)
-    def my_route():
-        pass
-
-    @hug_core.post(api=hug_core_api)
-    def my_second_route():
-        pass
-
-    @hug_core.cli(api=hug_core_api)
-    def my_cli_command():
-        pass
-
-    assert list(hug_core_api.http.urls()) == ["/root/my_route", "/root/my_second_route"]
-    assert list(hug_core_api.http.handlers()) == [
-        my_route.interface.http,
-        my_second_route.interface.http,
-    ]
-    assert list(hug_core_api.handlers()) == [
-        my_route.interface.http,
-        my_second_route.interface.http,
-        my_cli_command.interface.cli,
-    ]
-
-
-def test_cli_interface_api_with_exit_codes(hug_core_api_error_exit_codes_enabled):
-    api = hug_core_api_error_exit_codes_enabled
-
-    @hug_core.object(api=api)
-    class TrueOrFalse:
-        @hug_core.object.cli
-        def true(self):
-            return True
-
-        @hug_core.object.cli
-        def false(self):
-            return False
-
-    api.cli(args=[None, "true"])
-
-    with pytest.raises(SystemExit):
-        api.cli(args=[None, "false"])
-
-
-def test_cli_interface_api_without_exit_codes():
-    @hug_core.object(api=api)
-    class TrueOrFalse:
-        @hug_core.object.cli
-        def true(self):
-            return True
-
-        @hug_core.object.cli
-        def false(self):
-            return False
-
-    api.cli(args=[None, "true"])
-    api.cli(args=[None, "false"])

@@ -31,7 +31,7 @@ api = hug_core.API(__name__)
 def test_basic_call_async():
     """ The most basic Happy-Path test for Hug APIs using async """
 
-    @hug_core.call()
+    @hug_core.local()
     async def hello_world():
         return "Hello World!"
 
@@ -41,7 +41,7 @@ def test_basic_call_async():
 def tested_nested_basic_call_async():
     """Test to ensure the most basic call still works if applied to a method"""
 
-    @hug_core.call()
+    @hug_core.local()
     async def hello_world(self=None):
         return await nested_hello_world()
 
@@ -49,23 +49,21 @@ def tested_nested_basic_call_async():
     async def nested_hello_world(self=None):
         return "Hello World!"
 
-    assert hello_world.interface.http
     assert loop.run_until_complete(hello_world()) == "Hello World!"
-    assert hug_core.test.get(api, "/hello_world").data == "Hello World!"
+    assert hello_world() == "Hello World!"
 
 
 def test_basic_call_on_method_async():
     """Test to ensure the most basic call still works if applied to a method"""
 
     class API(object):
-        @hug_core.call()
+        @hug_core.local()
         async def hello_world(self=None):
             return "Hello World!"
 
     api_instance = API()
-    assert api_instance.hello_world.interface.http
     assert loop.run_until_complete(api_instance.hello_world()) == "Hello World!"
-    assert hug_core.test.get(api, "/hello_world").data == "Hello World!"
+    assert API.hello_world() == "Hello World!"
 
 
 def test_basic_call_on_method_through_api_instance_async():
@@ -77,12 +75,12 @@ def test_basic_call_on_method_through_api_instance_async():
 
     api_instance = API()
 
-    @hug_core.call()
+    @hug_core.local()
     async def hello_world():
         return api_instance.hello_world()
 
     assert api_instance.hello_world() == "Hello World!"
-    assert hug_core.test.get(api, "/hello_world").data == "Hello World!"
+    assert hello_world() == "Hello World!"
 
 
 def test_basic_call_on_method_registering_without_decorator_async():
@@ -90,7 +88,7 @@ def test_basic_call_on_method_registering_without_decorator_async():
 
     class API(object):
         def __init__(self):
-            hug_core.call()(self.hello_world_method)
+            hug_core.local()(self.hello_world_method)
 
         async def hello_world_method(self):
             return "Hello World!"
@@ -98,4 +96,3 @@ def test_basic_call_on_method_registering_without_decorator_async():
     api_instance = API()
 
     assert loop.run_until_complete(api_instance.hello_world_method()) == "Hello World!"
-    assert hug_core.test.get(api, "/hello_world_method").data == "Hello World!"

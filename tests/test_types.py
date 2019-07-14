@@ -468,11 +468,11 @@ def test_marshmallow_custom_context():
             assert self.context == custom_context
             self.context["marshmallow"] += 1
 
-    @hug_core.get()
+    @hug_core.local()
     def made_up_hello(test: MarshmallowContextSchema()):
         return "hi"
 
-    assert hug_core.test.get(api, "/made_up_hello", {"test": {"name": "test"}}).data == "hi"
+    assert made_up_hello({"name": "test"}) == "hi"
     assert custom_context["factory"] == 1
     assert custom_context["delete"] == 1
     assert custom_context["marshmallow"] == 1
@@ -524,7 +524,7 @@ def test_extending_types_with_context_with_no_error_messages():
             raise ValueError("This is not simple")
         return value
 
-    @hug_core.get("/check_the_types")
+    @hug_core.local("/check_the_types")
     def check_the_types(
         first: check_if_positive,
         second: check_if_near_the_right_number,
@@ -554,9 +554,7 @@ def test_extending_types_with_context_with_no_error_messages():
     ]
 
     for provided_values, expected_results in test_cases:
-        response = hug_core.test.get(
-            api,
-            "/check_the_types",
+        response = check_the_types(
             **{
                 "first": provided_values[0],
                 "second": provided_values[1],
@@ -565,7 +563,7 @@ def test_extending_types_with_context_with_no_error_messages():
                 "fifth": provided_values[4],
             }
         )
-        if response.data == "hi":
+        if response == "hi":
             errors = (None, None, None, None, None)
         else:
             errors = []
@@ -626,7 +624,7 @@ def test_extending_types_with_context_with_error_messages():
             raise ValueError("This is not simple")
         return value
 
-    @hug_core.get("/check_the_types")
+    @hug_core.local("/check_the_types")
     def check_the_types(
         first: check_if_positive,
         second: check_if_near_the_right_number,
@@ -647,9 +645,7 @@ def test_extending_types_with_context_with_error_messages():
     ]
 
     for provided_values, expected_results in test_cases:
-        response = hug_core.test.get(
-            api,
-            "/check_the_types",
+        response = check_the_types(
             **{
                 "first": provided_values[0],
                 "second": provided_values[1],
@@ -658,7 +654,7 @@ def test_extending_types_with_context_with_error_messages():
                 "fifth": provided_values[4],
             }
         )
-        if response.data == "hi":
+        if response == "hi":
             errors = (None, None, None, None, None)
         else:
             errors = []
@@ -753,7 +749,7 @@ def test_extending_types_with_exception_in_function():
         else:
             raise CustomFunctionException()
 
-    @hug_core.get("/raise_exception")
+    @hug_core.local("/raise_exception")
     def raise_exception(
         first: check_simple_exception,
         second: check_context_exception,
@@ -763,9 +759,7 @@ def test_extending_types_with_exception_in_function():
     ):
         return {}
 
-    response = hug_core.test.get(
-        api, "/raise_exception", **{"first": 1, "second": 1, "third": 1, "forth": 1, "fifth": 1}
-    )
+    response = raise_exception(**{"first": 1, "second": 1, "third": 1, "forth": 1, "fifth": 1})
     assert response.data["errors"] == {
         "forth": "function exception",
         "third": "function exception",
@@ -801,12 +795,12 @@ def test_validate_route_args_positive_case():
     class TestSchema(Schema):
         bar = fields.String()
 
-    @hug_core.get("/hello", args={"foo": fields.Integer(), "return": TestSchema()})
+    @hug_core.local(args={"foo": fields.Integer(), "return": TestSchema()})
     def hello(foo: int) -> dict:
         return {"bar": str(foo)}
 
-    response = hug_core.test.get(api, "/hello", **{"foo": 5})
-    assert response.data == {"bar": "5"}
+    response = hello(foo=5)
+    assert response == {"bar": "5"}
 
 
 def test_validate_route_args_negative_case():
@@ -820,9 +814,9 @@ def test_validate_route_args_negative_case():
     class TestSchema(Schema):
         bar = fields.Integer()
 
-    @hug_core.get("/foo", raise_on_invalid=True, args={"return": TestSchema()})
+    @hug_core.local(raise_on_invalid=True, args={"return": TestSchema()})
     def foo():
         return {"bar": "a"}
 
     with pytest.raises(InvalidTypeData):
-        hug_core.test.get(api, "/foo")
+        foo()

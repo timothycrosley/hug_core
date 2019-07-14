@@ -53,7 +53,7 @@ def test_html(hug_core_api):
 
     assert hug_core.output_format.html(FakeHTMLWithRender()) == b"test"
 
-    @hug_core.get("/get/html", output=hug_core.output_format.html, api=hug_core_api)
+    @hug_core.local(output=hug_core.output_format.html, api=hug_core_api)
     def get_html(**kwargs):
         """
         Returns command help document when no command is specified
@@ -61,7 +61,7 @@ def test_html(hug_core_api):
         with open(os.path.join(BASE_DIRECTORY, "examples/document.html"), "rb") as html_file:
             return html_file.read()
 
-    assert "<html>" in hug_core.test.get(hug_core_api, "/get/html").data
+    assert b"<html>" in get_html()
 
 
 def test_json():
@@ -146,221 +146,6 @@ def test_json_camelcase():
     assert "wont_be_convert" in output
 
 
-def test_image():
-    """Ensure that it's possible to output images with hug_core"""
-    logo_path = os.path.join(BASE_DIRECTORY, "artwork", "logo.png")
-    assert hasattr(hug_core.output_format.png_image(logo_path, hug_core.Response()), "read")
-    with open(logo_path, "rb") as image_file:
-        assert hasattr(hug_core.output_format.png_image(image_file, hug_core.Response()), "read")
-
-    assert hug_core.output_format.png_image("Not Existent", hug_core.Response()) is None
-
-    class FakeImageWithSave:
-        def save(self, to, format):
-            to.write(b"test")
-
-    assert hasattr(hug_core.output_format.png_image(FakeImageWithSave(), hug_core.Response()), "read")
-
-    class FakeImageWithRender:
-        def render(self):
-            return "test"
-
-    assert hug_core.output_format.svg_xml_image(FakeImageWithRender(), hug_core.Response()) == "test"
-
-    class FakeImageWithSaveNoFormat:
-        def save(self, to):
-            to.write(b"test")
-
-    assert hasattr(hug_core.output_format.png_image(FakeImageWithSaveNoFormat(), hug_core.Response()), "read")
-
-
-def test_file():
-    """Ensure that it's possible to easily output files"""
-
-    class FakeResponse(object):
-        pass
-
-    logo_path = os.path.join(BASE_DIRECTORY, "artwork", "logo.png")
-    fake_response = FakeResponse()
-    assert hasattr(hug_core.output_format.file(logo_path, fake_response), "read")
-    assert fake_response.content_type == "image/png"
-    with open(logo_path, "rb") as image_file:
-        hasattr(hug_core.output_format.file(image_file, fake_response), "read")
-
-    assert not hasattr(hug_core.output_format.file("NON EXISTENT FILE", fake_response), "read")
-    assert hug_core.output_format.file(None, fake_response) == ""
-
-
-def test_video():
-    """Ensure that it's possible to output videos with hug_core"""
-    gif_path = os.path.join(BASE_DIRECTORY, "artwork", "example.gif")
-    assert hasattr(hug_core.output_format.mp4_video(gif_path, hug_core.Response()), "read")
-    with open(gif_path, "rb") as image_file:
-        assert hasattr(hug_core.output_format.mp4_video(image_file, hug_core.Response()), "read")
-
-    assert hug_core.output_format.mp4_video("Not Existent", hug_core.Response()) is None
-
-    class FakeVideoWithSave:
-        def save(self, to, format):
-            to.write(b"test")
-
-    assert hasattr(hug_core.output_format.mp4_video(FakeVideoWithSave(), hug_core.Response()), "read")
-
-    class FakeVideoWithSave:
-        def render(self):
-            return "test"
-
-    assert hug_core.output_format.avi_video(FakeVideoWithSave(), hug_core.Response()) == "test"
-
-
-def test_on_valid():
-    """Test to ensure formats that use on_valid content types gracefully handle error dictionaries"""
-    error_dict = {"errors": {"so": "many"}}
-    expected = hug_core.output_format.json(error_dict)
-
-    assert hug_core.output_format.mp4_video(error_dict, hug_core.Response()) == expected
-    assert hug_core.output_format.png_image(error_dict, hug_core.Response()) == expected
-
-    @hug_core.output_format.on_valid("image", hug_core.output_format.file)
-    def my_output_format(data):
-        raise ValueError("This should never be called")
-
-    assert my_output_format(error_dict, hug_core.Response())
-
-
-def test_on_content_type():
-    """Ensure that it's possible to route the output type format by the requested content-type"""
-    formatter = hug_core.output_format.on_content_type(
-        {"application/json": hug_core.output_format.json, "text/plain": hug_core.output_format.text}
-    )
-
-    class FakeRequest(object):
-        content_type = "application/json"
-
-    request = FakeRequest()
-    response = FakeRequest()
-    converted = hug_core.input_format.json(
-        formatter(BytesIO(hug_core.output_format.json({"name": "name"})), request, response)
-    )
-    assert converted == {"name": "name"}
-
-    request.content_type = "text/plain"
-    assert formatter("hi", request, response) == b"hi"
-
-    with pytest.raises(hug_core.HTTPNotAcceptable):
-        request.content_type = "undefined; always"
-        formatter("hi", request, response)
-
-
-def test_accept():
-    """Ensure that it's possible to route the output type format by the requests stated accept header"""
-    formatter = hug_core.output_format.accept(
-        {"application/json": hug_core.output_format.json, "text/plain": hug_core.output_format.text}
-    )
-
-    class FakeRequest(object):
-        accept = "application/json"
-
-    request = FakeRequest()
-    response = FakeRequest()
-    converted = hug_core.input_format.json(
-        formatter(BytesIO(hug_core.output_format.json({"name": "name"})), request, response)
-    )
-    assert converted == {"name": "name"}
-
-    request.accept = "text/plain"
-    assert formatter("hi", request, response) == b"hi"
-
-    request.accept = "application/json, text/plain; q=0.5"
-    assert formatter("hi", request, response) == b'"hi"'
-
-    request.accept = "text/plain; q=0.5, application/json"
-    assert formatter("hi", request, response) == b'"hi"'
-
-    request.accept = "application/json;q=0.4,text/plain; q=0.5"
-    assert formatter("hi", request, response) == b"hi"
-
-    request.accept = "*"
-    assert formatter("hi", request, response) in [b'"hi"', b"hi"]
-
-    request.accept = "undefined; always"
-    with pytest.raises(hug_core.HTTPNotAcceptable):
-        formatter("hi", request, response)
-
-    formatter = hug_core.output_format.accept(
-        {"application/json": hug_core.output_format.json, "text/plain": hug_core.output_format.text},
-        hug_core.output_format.json,
-    )
-    assert formatter("hi", request, response) == b'"hi"'
-
-
-def test_accept_with_http_errors():
-    """Ensure that content type based output formats work for HTTP error responses"""
-    formatter = hug_core.output_format.accept(
-        {"application/json": hug_core.output_format.json, "text/plain": hug_core.output_format.text},
-        default=hug_core.output_format.json,
-    )
-
-    api = hug_core.API("test_accept_with_http_errors")
-    hug_core.default_output_format(api=api)(formatter)
-
-    @hug_core.get("/500", api=api)
-    def error_500():
-        raise hug_core.HTTPInternalServerError("500 Internal Server Error", "This is an example")
-
-    response = hug_core.test.get(api, "/500")
-    assert response.status == "500 Internal Server Error"
-    assert response.data == {"errors": {"500 Internal Server Error": "This is an example"}}
-
-
-def test_suffix():
-    """Ensure that it's possible to route the output type format by the suffix of the requested URL"""
-    formatter = hug_core.output_format.suffix(
-        {".js": hug_core.output_format.json, ".html": hug_core.output_format.text}
-    )
-
-    class FakeRequest(object):
-        path = "endpoint.js"
-
-    request = FakeRequest()
-    response = FakeRequest()
-    converted = hug_core.input_format.json(
-        formatter(BytesIO(hug_core.output_format.json({"name": "name"})), request, response)
-    )
-    assert converted == {"name": "name"}
-
-    request.path = "endpoint.html"
-    assert formatter("hi", request, response) == b"hi"
-
-    with pytest.raises(hug_core.HTTPNotAcceptable):
-        request.path = "undefined.always"
-        formatter("hi", request, response)
-
-
-def test_prefix():
-    """Ensure that it's possible to route the output type format by the prefix of the requested URL"""
-    formatter = hug_core.output_format.prefix(
-        {"js/": hug_core.output_format.json, "html/": hug_core.output_format.text}
-    )
-
-    class FakeRequest(object):
-        path = "js/endpoint"
-
-    request = FakeRequest()
-    response = FakeRequest()
-    converted = hug_core.input_format.json(
-        formatter(BytesIO(hug_core.output_format.json({"name": "name"})), request, response)
-    )
-    assert converted == {"name": "name"}
-
-    request.path = "html/endpoint"
-    assert formatter("hi", request, response) == b"hi"
-
-    with pytest.raises(hug_core.HTTPNotAcceptable):
-        request.path = "undefined.always"
-        formatter("hi", request, response)
-
-
 def test_json_converter_numpy_types():
     """Ensure that numpy-specific data types (array, int, float) are properly supported in JSON output."""
     ex_int = numpy.int_(9)
@@ -433,4 +218,4 @@ def test_output_format_with_no_docstring():
     def test_fmt(data, request=None, response=None):
         return str(data).encode("utf8")
 
-    hug_core.output_format.on_content_type({"test/fmt": test_fmt})
+    assert test_fmt("hi") == b"hi"

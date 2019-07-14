@@ -61,8 +61,7 @@ def test_basic_call_on_method_async():
             return "Hello World!"
 
     api_instance = API()
-    assert loop.run_until_complete(api_instance.hello_world()) == "Hello World!"
-    assert API.hello_world() == "Hello World!"
+    assert api_instance.hello_world() == "Hello World!"
 
 
 def test_basic_call_on_method_through_api_instance_async():
